@@ -1,0 +1,17 @@
+
+================================================================================================================================
+BATCH LOAD ERRORS
+Source: output/data/
+Time:   2026-02-22 22:26:50
+Count:  9
+
+ 1: Invalid Client Exception: Record number 8 in clients file. Must have 4 columns
+ 2: DuplicateEmailException: Duplicate email detected: Record number 11 in clients has an email which already exists for another user.
+ 3: Invalid Accommodation Exception: Record number 11 in accommodations file. Accommodation Error: Unknown Accommodation type: HOME
+ 4: Invalid Transportation Exception: Record number 11 in transports file. Transport Error: Unknown transport type: CRUISE
+ 5: Invalid Trip Exception: Record number 10 in trips file. Trip Error: Duration < 0: -2
+ 6: Invalid Trip Exception: Record number 11 in trips file. Entity not found: ID = Transportation not found: T5005
+ 7: Invalid Trip Exception: Record number 12 in trips file. Entity not found: ID = Client not found: C9999
+ 8: Invalid Trip Exception: Record number 13 in trips file. Trip Error: Invalid tripId: X6008
+ 9: Invalid Trip Exception: Record number 14 in trips file. Entity not found: ID = Accommodation not found: A4104
+================================================================================================================================
