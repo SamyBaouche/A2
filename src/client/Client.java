@@ -1,7 +1,6 @@
 package client;
 
 import exceptions.InvalidClientDataException;
-
 import java.util.Objects;
 
 /**
@@ -24,13 +23,15 @@ public class Client {
      * Creates a client with empty fields and an auto-generated ID.
      */
 
-    public Client() {
+    public Client() throws  InvalidClientDataException {
         this.clientId = "C" + idCounter;
         idCounter++;
 
-        this.firstName = "";
-        this.lastName = "";
-        this.email = "";
+        setFirstName("Unknown");
+        setLastName("Unknown");
+        setEmail("unknown@gmail.com");
+        this.amountSpent = 0.0;
+
     }
 
     /**
@@ -56,13 +57,14 @@ public class Client {
      * Creates a new Client object based on another Client.
      * A new unique ID is generated.
      */
-    public Client (Client other) {
+    public Client (Client other) throws InvalidClientDataException {
         this.clientId = "C" + idCounter;
         idCounter++;
 
-        this.firstName = other.firstName;
-        this.lastName = other.lastName;
-        this.email = other.email;
+        setFirstName(other.firstName);
+        setLastName(other.lastName);
+        setEmail(other.email);
+        this.amountSpent = other.amountSpent;
 
     }
 
@@ -126,7 +128,7 @@ public class Client {
         return "Client Info: " +
                 "[ID: " + clientId +
                 ", Name: " + firstName + " " + lastName +
-                ", Email: " + email + "]";
+                ", Email: " + email + ", Total Amount Spent: " + amountSpent + "]";
     }
 
     /**
@@ -140,7 +142,8 @@ public class Client {
         return Objects.equals(clientId, other.clientId) &&
                 Objects.equals(firstName, other.firstName) &&
                 Objects.equals(lastName, other.lastName) &&
-                Objects.equals(email, other.email);
+                Objects.equals(email, other.email) &&
+                Double.compare(amountSpent, other.amountSpent) == 0;
     }
 
 
