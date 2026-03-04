@@ -19,17 +19,17 @@ public class Hostel extends Accommodation {
      * Default constructor.
      * Calls the parent constructor and initializes sharedBeds to 0.
      */
-    public Hostel() {
+    public Hostel() throws  InvalidAccommodationDataException {
         super();
-        this.sharedBeds = 0;
+        this.sharedBeds = 1;
     }
 
     /**
      * Parameterized constructor.
      * Initializes hostel information including shared beds.
      */
-    public Hostel(String name, String location, double pricePerNight, int sharedBeds) {
-        super(name, location, pricePerNight);
+    public Hostel(String name, String location, double pricePerNight, int stars, int sharedBeds) throws InvalidAccommodationDataException {
+        super(name, location, pricePerNight,stars);
         this.sharedBeds = sharedBeds;
     }
 
@@ -37,9 +37,18 @@ public class Hostel extends Accommodation {
      * Copy constructor.
      * Creates a new Hostel object based on another Hostel.
      */
-    public Hostel(Hostel other) {
+    public Hostel(Hostel other)  throws InvalidAccommodationDataException {
         super(other);
         this.sharedBeds = other.sharedBeds;
+    }
+
+    /**
+     * Parameterized constructor for loading data from files (CSV).
+     * Takes an existing ID instead of auto-generating one.
+     */
+    public Hostel(String accommodationId, String name, String location, double pricePerNight, int stars, int sharedBeds) throws InvalidAccommodationDataException {
+        super(accommodationId, name, location, pricePerNight, stars);
+        this.sharedBeds = sharedBeds;
     }
 
     // Getters and Setters
@@ -97,9 +106,9 @@ public class Hostel extends Accommodation {
     public double calculateCost(int numberOfDays) throws InvalidAccommodationDataException {
         // Rule: Number of nights >= 1 [cite: 50]
         if (numberOfDays < 1) {
-            throw new InvalidAccommodationDataException("Number of nights must be at least 1.");
+            throw new InvalidAccommodationDataException("Number of nights must be at least 1");
         }
         return (getPricePerNight() * numberOfDays) / sharedBeds;
     }
 }
-}
+

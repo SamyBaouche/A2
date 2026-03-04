@@ -1,6 +1,10 @@
 package driver;
 
 import client.Client;
+import exceptions.InvalidAccommodationDataException;
+import exceptions.InvalidClientDataException;
+import exceptions.InvalidTransportDataException;
+import exceptions.InvalidTripDataException;
 import travel.*;
 
 import java.util.Scanner;
@@ -138,7 +142,7 @@ public class SmartTravelDriver {
     }
 
     // --- Additional Operations ---
-    public static void mostExpensiveTrip(Trip[] trips) {
+    public static void mostExpensiveTrip(Trip[] trips) throws InvalidAccommodationDataException, InvalidTripDataException {
 
         if (trips.length != 0) {
             double topPrice = 0;
@@ -162,7 +166,7 @@ public class SmartTravelDriver {
     /**
      * Creates a deep copy of a transportation array.
      */
-    public static Transportation[] copyTransportationArray(Transportation[] original) {
+    public static Transportation[] copyTransportationArray(Transportation[] original) throws InvalidTransportDataException {
 
         Transportation[] copy = new Transportation[original.length];
 
@@ -183,7 +187,7 @@ public class SmartTravelDriver {
     /**
      * Creates a deep copy of an accommodation array.
      */
-    public static Accommodation[] copyAccommodationArray(Accommodation[] original) {
+    public static Accommodation[] copyAccommodationArray(Accommodation[] original) throws InvalidAccommodationDataException {
 
         Accommodation[] copy = new Accommodation[original.length];
 
@@ -275,7 +279,7 @@ public class SmartTravelDriver {
      * editClient(): Allows user to select a client and update their information.
      */
 
-    public static void editClient() {
+    public static void editClient() throws InvalidClientDataException {
         if (clients.length == 0) {
             System.out.println("There is no client to edit.");
         } else {
@@ -399,7 +403,7 @@ public class SmartTravelDriver {
      * a client, accommodation, and transportation.
      * Adds the trip to the trips array.
      */
-    public static void createTrip() {
+    public static void createTrip() throws InvalidClientDataException {
 
         Accommodation accomodation = null;
         Transportation transportation = null;

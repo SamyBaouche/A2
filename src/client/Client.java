@@ -1,7 +1,6 @@
 package client;
 
 import exceptions.InvalidClientDataException;
-
 import java.util.Objects;
 
 /**
@@ -24,13 +23,14 @@ public class Client {
      * Creates a client with empty fields and an auto-generated ID.
      */
 
-    public Client() {
+    public Client() throws InvalidClientDataException {
         this.clientId = "C" + idCounter;
         idCounter++;
 
-        this.firstName = "";
-        this.lastName = "";
-        this.email = "";
+        setFirstName("Unknown");
+        setLastName("Unknown");
+        setEmail("unknown@gmail.com");
+        this.amountSpent = 0.0;
     }
 
     /**
@@ -56,14 +56,30 @@ public class Client {
      * Creates a new Client object based on another Client.
      * A new unique ID is generated.
      */
-    public Client (Client other) {
+    public Client (Client other) throws InvalidClientDataException {
+        if (other == null) {
+            throw new InvalidClientDataException("Can't copy a null client");
+        }
         this.clientId = "C" + idCounter;
         idCounter++;
 
-        this.firstName = other.firstName;
-        this.lastName = other.lastName;
-        this.email = other.email;
+        setFirstName(other.firstName);
+        setLastName(other.lastName);
+        setEmail(other.email);
+        this.amountSpent = other.amountSpent;
+    }
 
+    /**
+     * Parameterized constructor for loading data from files.
+     * Takes an existing clientId instead of auto-generating a new one.
+     */
+    public Client(String clientId, String firstName, String lastName, String email) throws InvalidClientDataException {
+        this.clientId = clientId;
+
+        setFirstName(firstName);
+        setLastName(lastName);
+        setEmail(email);
+        this.amountSpent = 0.0;
     }
 
     // Getters and Setters
@@ -126,7 +142,8 @@ public class Client {
         return "Client Info: " +
                 "[ID: " + clientId +
                 ", Name: " + firstName + " " + lastName +
-                ", Email: " + email + "]";
+                ", Email: " + email +
+                ", Total Spent: $" + amountSpent +"]";
     }
 
     /**

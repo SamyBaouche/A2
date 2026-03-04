@@ -1,6 +1,8 @@
 package travel;
 
 import java.util.Objects;
+import exceptions.InvalidTransportDataException;
+
 
 /**
  * The Train class represents a train transportation.
@@ -10,7 +12,6 @@ import java.util.Objects;
 public class Train extends Transportation {
 
     private String trainType;
-    private String seatClass;
 
     private final static double FIRST_CLASS_PRICE = 250;
     private final static double ECONOMY_PRICE = 75;
@@ -19,10 +20,9 @@ public class Train extends Transportation {
      * Default constructor.
      * Initializes parent attributes and sets train-specific fields to empty.
      */
-    public Train() {
+    public Train() throws InvalidTransportDataException {
         super();
-        this.seatClass = "";
-        this.trainType = "";
+        this.trainType = "Basic";
     }
     /**
      * Parameterized constructor.
@@ -34,22 +34,30 @@ public class Train extends Transportation {
      * @param seatClass     Seat category (Economy / First Class)
      */
     public Train(String companyName, String departureCity,
-                 String arrivalCity, String trainType, String seatClass) {
+                 String arrivalCity,double price, String trainType, String seatClass) throws InvalidTransportDataException {
 
-        super(companyName, departureCity, arrivalCity);
+        super(companyName, departureCity, arrivalCity,price);
         this.trainType = trainType;
-        this.seatClass = seatClass;
     }
+
+    /**
+     * Parameterized constructor for loading data from files (CSV) WITHOUT seat class.
+     * Matches the CSV format: TRAIN; TR3002;Shinkansen;Tokyo; Kyoto;250.00;HighSpeed
+     */
+    public Train(String transportId, String companyName, String departureCity, String arrivalCity, double price, String trainType) throws InvalidTransportDataException {
+        super(transportId, companyName, departureCity, arrivalCity, price);
+        this.trainType = trainType;
+    }
+
     /**
      * Copy constructor.
      *
      * @param other Train object to copy
      */
-    public Train(Train other) {
+    public Train(Train other) throws InvalidTransportDataException {
 
         super(other);
         this.trainType = other.trainType;
-        this.seatClass = other.seatClass;
     }
 
     //Getters and Setters
@@ -62,13 +70,6 @@ public class Train extends Transportation {
         this.trainType = trainType;
     }
 
-    public String getSeatClass() {
-        return seatClass;
-    }
-
-    public void setSeatClass(String seatClass) {
-        this.seatClass = seatClass;
-    }
 
     /**
      * Returns a string representation of the Train object.
@@ -78,8 +79,7 @@ public class Train extends Transportation {
     @Override
     public String toString() {
         return "Train [" + super.toString() +
-                ", Type: " + trainType +
-                ", Class: " + seatClass + "]";
+                ", Type: " + trainType + "]";
     }
 
     /**
@@ -97,7 +97,7 @@ public class Train extends Transportation {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Train other = (Train) o;
-        return Objects.equals(trainType, other.trainType) && Objects.equals(seatClass, other.seatClass);
+        return Objects.equals(trainType, other.trainType) ;
     }
 
     /**
@@ -111,14 +111,7 @@ public class Train extends Transportation {
     @Override
     public double calculateCost(int numberOfDays) {
 
-        double cost = 0;
 
-        if (seatClass.equalsIgnoreCase("Economy")) {
-            cost = ECONOMY_PRICE;
-        } else if (seatClass.equalsIgnoreCase("First Class")) {
-            cost = FIRST_CLASS_PRICE;
-        }
-
-        return cost;
+        return getPrice();
     }
 }

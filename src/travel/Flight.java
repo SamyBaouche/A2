@@ -12,21 +12,18 @@ import java.util.Objects;
 
 public class Flight extends Transportation {
 
-    // Name of the airline operating the flight
-    private String airlineName;
-
     // Maximum luggage weight allowed (in kg)
     private double luggageAllowance;
 
-    private final static double BASE_FLIGHT_PRICE = 400;
+    //private final static double BASE_FLIGHT_PRICE = 400;
 
     /**
      * Default constructor.
      * Initializes empty transportation data and sets luggage allowance to 0.
      */
-    public Flight() {
-        super("", "", "");
-        this.luggageAllowance = 0.0;
+    public Flight() throws InvalidTransportDataException {
+        super();
+        setLuggageAllowance(0.0);
     }
 
     /**
@@ -38,9 +35,9 @@ public class Flight extends Transportation {
      * @param luggageAllowance Allowed luggage weight (kg)
      */
     public Flight(String companyName, String departureCity,
-                  String arrivalCity, double luggageAllowance) throws InvalidTransportDataException {
+                  String arrivalCity,double price, double luggageAllowance) throws InvalidTransportDataException {
 
-        super(companyName, departureCity, arrivalCity);
+        super(companyName, departureCity, arrivalCity,price);
         setLuggageAllowance(luggageAllowance);
     }
 
@@ -49,10 +46,18 @@ public class Flight extends Transportation {
      *
      * @param other Flight object to copy
      */
-    public Flight(Flight other) {
+    public Flight(Flight other) throws InvalidTransportDataException {
         super(other);
-        this.airlineName = other.airlineName;
-        this.luggageAllowance = other.luggageAllowance;
+        setLuggageAllowance(other.luggageAllowance);
+    }
+
+    /**
+     * Parameterized constructor for loading data from files (CSV).
+     * Takes an existing ID instead of auto-generating one.
+     */
+    public Flight(String transportId, String companyName, String departureCity, String arrivalCity, double price, double luggageAllowance) throws InvalidTransportDataException {
+        super(transportId, companyName, departureCity, arrivalCity, price);
+        setLuggageAllowance(luggageAllowance);
     }
 
     public double getLuggageAllowance() {
@@ -75,7 +80,6 @@ public class Flight extends Transportation {
     @Override
     public String toString() {
         return "Flight [" + super.toString() +
-                ", Airline: " + airlineName +
                 ", Luggage: " + luggageAllowance + "kg]";
     }
 
@@ -96,13 +100,13 @@ public class Flight extends Transportation {
         if (!super.equals(o)) return false;
 
         Flight other = (Flight) o;
-        return Double.compare(luggageAllowance, other.luggageAllowance) == 0 && Objects.equals(airlineName, other.airlineName);
+        return Double.compare(luggageAllowance, other.luggageAllowance) == 0
     }
 
 
     @Override
     public double calculateCost(int numberOfDays) {
         //Implemented luggageAllowance into the cost calcul
-        return BASE_FLIGHT_PRICE + (luggageAllowance * 1);
+        return getPrice() + (luggageAllowance * 1);
     }
 }

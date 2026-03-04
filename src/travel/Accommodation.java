@@ -6,23 +6,25 @@ import java.util.Objects;
 
 public abstract class Accommodation {
 
-    private String accommodationId;
-    private String name;
-    private String location;
-    private double pricePerNight;
+    protected String accommodationId;
+    protected String name;
+    protected String location;
+    protected double pricePerNight;
+    protected int stars;
 
     private static int idCounter = 4001;
 
-    public Accommodation() {
+    public Accommodation()  throws InvalidAccommodationDataException {
         this.accommodationId = "A" + idCounter;
         idCounter++;
 
-        this.name = "";
-        this.location = "";
-        this.pricePerNight = 0.0;
+        this.name = "Unknown";
+        this.location = "Unknown";
+        setPricePerNight(1.0);
+        setStars(1);
     }
 
-    public Accommodation(String name, String location, double pricePerNight) throws InvalidAccommodationDataException{
+    public Accommodation(String name, String location, double pricePerNight, int stars) throws InvalidAccommodationDataException{
 
         this.accommodationId = "A" + idCounter;
         idCounter++;
@@ -30,16 +32,33 @@ public abstract class Accommodation {
         this.name = name;
         this.location = location;
         setPricePerNight(pricePerNight);
+        setStars(stars);
     }
 
-    public Accommodation(Accommodation other) {
-
+    public Accommodation(Accommodation other) throws InvalidAccommodationDataException {
+        if (other == null) {
+            throw new InvalidAccommodationDataException("Can't copy a null accommodation");
+        }
         this.accommodationId = "A" + idCounter;
         idCounter++;
 
         this.name = other.name;
         this.location = other.location;
-        this.pricePerNight = other.pricePerNight;
+        setPricePerNight(other.pricePerNight);
+        setStars(other.stars);
+    }
+
+    /**
+     * Parameterized constructor for loading data from files (CSV).
+     * Takes an existing ID instead of auto-generating one.
+     */
+    public Accommodation(String accommodationId, String name, String location, double pricePerNight, int stars) throws InvalidAccommodationDataException {
+        this.accommodationId = accommodationId;
+
+        this.name = name;
+        this.location = location;
+        setPricePerNight(pricePerNight);
+        setStars(stars);
     }
 
     public String getAccommodationId() {
@@ -70,6 +89,10 @@ public abstract class Accommodation {
         return pricePerNight;
     }
 
+    public int getStars() {
+        return stars;
+    }
+
     public void setPricePerNight(double pricePerNight) throws InvalidAccommodationDataException {
         // Rule: Price/night > $0
         if (pricePerNight <= 0) {
@@ -78,24 +101,43 @@ public abstract class Accommodation {
         this.pricePerNight = pricePerNight;
     }
 
+    public void setStars(int stars) throws InvalidAccommodationDataException {
+        // Rule: Stars 1-5
+        if (stars < 1 || stars > 5) {
+            throw new InvalidAccommodationDataException("Star rating must be between 1 and 5.");
+        }
+        this.stars = stars;
+    }
+
     @Override
     public String toString() {
         return "ID: " + accommodationId +
                 ", Name: " + name +
                 ", Location: " + location +
-                ", Rate: $" + pricePerNight + "/night";
+                ", Rate: $" + pricePerNight + "/night" +
+                ", Stars: " + stars;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Accommodation other = (Accommodation) o;
-        return Double.compare(pricePerNight, other.pricePerNight) == 0
-                && Objects.equals(name, other.name)
-                && Objects.equals(location, other.location);
+        return Double.compare(other.pricePerNight, pricePerNight) == 0 &&
+                stars == other.stars &&
+                Objects.equals(name, other.name) &&
+                Objects.equals(location, other.location);
     }
 
-    public abstract double calculateCost(int numberOfDays) throws InvalidAccommodationDataException;
+    /**
+     * Calculates the total cost for the accommodation.
+     * Enforces the rule that the number of nights must be >= 1.
+     */
+    public double calculateCost(int numberOfDays) throws InvalidAccommodationDataException {
+        if (numberOfDays < 1) {
+            throw new InvalidAccommodationDataException("Number of nights must be at least 1.");
+        }
+        return pricePerNight * numberOfDays;
+    }
 
 
 }

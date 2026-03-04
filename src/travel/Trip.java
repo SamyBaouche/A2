@@ -1,6 +1,7 @@
 package travel;
 
 import client.Client;
+import exceptions.InvalidAccommodationDataException;
 import exceptions.InvalidTripDataException;
 
 /**
@@ -32,8 +33,11 @@ public class Trip {
 
         setBasePrice(basePrice);
         setDurationInDays(durationInDays);
+        setClientAssociated(client);
 
-        this.clientAssociated = client;
+        if (accommodation == null && transportation == null) {
+            throw new InvalidTripDataException("A trip must have at least an accommodation or a transportation.");
+        }
         this.accommodation = accommodation;
         this.transportation = transportation;
     }
@@ -42,13 +46,11 @@ public class Trip {
      * Default constructor.
      * Creates an empty trip with default values.
      */
-    public Trip () {
+    public Trip () throws InvalidTripDataException {
         this.tripID = "T" + tripIdCounter++;
-        this.destination = "";
-        this.durationInDays = 0;
-        this.basePrice = 0;
-        this.accommodation = null;
-        this.transportation = null;
+        this.destination = "Unknown";
+        setBasePrice(100.0); // Rule: >= $100.00
+        setDurationInDays(1); // Rule: 1-20 days
     }
 
     /**
@@ -57,12 +59,39 @@ public class Trip {
      * A new unique ID is generated.
      */
 
-    public Trip(Trip trip) {
+    public Trip(Trip trip) throws InvalidTripDataException {
+        if (trip == null) {
+            throw new InvalidTripDataException("Cannot copy a null trip.");
+        }
         this.tripID = "T" + tripIdCounter++;
         this.destination = trip.getDestination();
-        this.durationInDays = trip.getDurationInDays();
-        this.basePrice = trip.getBasePrice();
-        this.clientAssociated = trip.getClientAssociated();
+
+        setBasePrice(trip.getBasePrice());
+        setDurationInDays(trip.getDurationInDays());
+        setClientAssociated(trip.getClientAssociated());
+
+        this.accommodation = trip.getAccommodation();
+        this.transportation = trip.getTransportation();
+    }
+
+    /**
+     * Parameterized constructor for loading data from files (CSV).
+     * Takes an existing ID instead of auto-generating one.
+     */
+    public Trip(String tripID, String destination, int durationInDays, double basePrice, Client client, Accommodation accommodation, Transportation transportation) throws InvalidTripDataException {
+        this.tripID = tripID;
+        this.destination = destination;
+
+        setBasePrice(basePrice);
+        setDurationInDays(durationInDays);
+        setClientAssociated(client);
+
+        // Rule: Accommodation/Transportation are optional, but minimum one required
+        if (accommodation == null && transportation == null) {
+            throw new InvalidTripDataException("A trip must have at least an accommodation or a transportation.");
+        }
+        this.accommodation = accommodation;
+        this.transportation = transportation;
     }
 
     /**
@@ -70,7 +99,7 @@ public class Trip {
      * Includes base price, accommodation cost, and transportation cost.
      */
 
-    public double calculateTotalCost() {
+    public double calculateTotalCost() throws InvalidAccommodationDataException {
         double cost = 0;
         cost += basePrice;
 
@@ -113,32 +142,17 @@ public class Trip {
 
     // Getters and Setters
 
-    public String getTripId() {
-        return tripID;
-    }
-    public String getDestination() {
-        return destination;
-    }
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-    public int getDurationInDays() {
-        return durationInDays;
-    }
-    public double getBasePrice() {
-        return basePrice;
-    }
-    public Client getClientAssociated() {
-        return clientAssociated;
-    }
-    public Transportation getTransportation() {
-        return transportation;
-    }
-    public Accommodation getAccommodation() {
-        return accommodation;
-    }
+    public String getTripId() { return tripID; }
+    public String getDestination() { return destination; }
+    public int getDurationInDays() { return durationInDays; }
+    public double getBasePrice() { return basePrice; }
+    public Client getClientAssociated() { return clientAssociated; }
+    public Transportation getTransportation() { return transportation; }
+    public Accommodation getAccommodation() { return accommodation; }
 
-
+    // Setters with Business Rule Validation
+    public void setTripId(String tripID) { this.tripID = tripID; }
+    public void setDestination(String destination) { this.destination = destination; }
 
     public void setDurationInDays(int durationDays) throws InvalidTripDataException {
         // Rule: 1-20 days
@@ -156,21 +170,24 @@ public class Trip {
         this.basePrice = basePrice;
     }
 
-    public void setClientAssociated(Client clientAssociated) {
+    public void setClientAssociated(Client clientAssociated) throws InvalidTripDataException {
+        // Rule: ClientID is mandatory
+        if (clientAssociated == null) {
+            throw new InvalidTripDataException("A trip must be associated with a valid client.");
+        }
         this.clientAssociated = clientAssociated;
     }
 
-    public void setTripId(String tripID) {
-        this.tripID = tripID;
-    }
-
-    public void setTransportation(Transportation transportation) {
+    public void setTransportation(Transportation transportation) throws InvalidTripDataException {
+        if (this.accommodation == null && transportation == null) {
+            throw new InvalidTripDataException("Cannot remove transportation if no accommodation exists.");
+        }
         this.transportation = transportation;
     }
 
-    public void setAccommodation(Accommodation accommodation) {
+    public void setAccommodation(Accommodation accommodation) throws InvalidTripDataException {
+        if (this.transportation == null && accommodation == null) {
+            throw new InvalidTripDataException("Cannot remove accommodation if no transportation exists.");
+        }
         this.accommodation = accommodation;
     }
-
-
-}

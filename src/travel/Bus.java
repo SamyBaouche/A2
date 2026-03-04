@@ -12,10 +12,9 @@ import java.util.Objects;
  */
 public class Bus extends Transportation {
 
-    private String busCompany;
     private int numberOfStops;
 
-    private final static double DAILY_PASS_PRICE = 5;
+   private final static double DAILY_PASS_PRICE = 5;
     private final static double DISCOUNT = 0.75;
 
     /**
@@ -23,10 +22,9 @@ public class Bus extends Transportation {
      * Initializes parent attributes and sets
      * bus-specific fields to default values.
      */
-    public Bus() {
+    public Bus() throws InvalidTransportDataException {
         super();
-        this.busCompany = "";
-        this.numberOfStops = 0;
+        setNumberOfStops(1);
     }
 
     /**
@@ -38,9 +36,9 @@ public class Bus extends Transportation {
      * @param numberOfStops Number of stops during the trip
      */
     public Bus(String companyName, String departureCity,
-               String arrivalCity, int numberOfStops) throws InvalidTransportDataException {
+               String arrivalCity,double price, int numberOfStops) throws InvalidTransportDataException {
 
-        super(companyName, departureCity, arrivalCity);
+        super(companyName, departureCity, arrivalCity,price);
         setNumberOfStops(numberOfStops);
     }
 
@@ -49,21 +47,22 @@ public class Bus extends Transportation {
      *
      * @param other Bus object to copy
      */
-    public Bus(Bus other) {
+    public Bus(Bus other) throws InvalidTransportDataException {
         super(other);
-        this.busCompany = other.busCompany;
-        this.numberOfStops = other.numberOfStops;
+        setNumberOfStops(other.numberOfStops);
+    }
+
+    /**
+     * Parameterized constructor for loading data from files (CSV).
+     * Takes an existing ID instead of auto-generating one.
+     */
+    public Bus(String transportId, String companyName, String departureCity, String arrivalCity, double price, int numberOfStops) throws InvalidTransportDataException {
+        super(transportId, companyName, departureCity, arrivalCity, price);
+        setNumberOfStops(numberOfStops);
     }
 
     // Getters and Setters
 
-    public String getBusCompany() {
-        return busCompany;
-    }
-
-    public void setBusCompany(String busCompany) {
-        this.busCompany = busCompany;
-    }
 
     public int getNumberOfStops() {
         return numberOfStops;
@@ -85,7 +84,6 @@ public class Bus extends Transportation {
     @Override
     public String toString() {
         return "Bus [" + super.toString() +
-                ", Operator: " + busCompany +
                 ", Stops: " + numberOfStops + "]";
     }
 
@@ -104,7 +102,7 @@ public class Bus extends Transportation {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Bus other = (Bus) o;
-        return numberOfStops == other.numberOfStops && Objects.equals(busCompany, other.busCompany);
+        return numberOfStops == other.numberOfStops;
     }
 
     @Override

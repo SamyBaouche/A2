@@ -1,6 +1,7 @@
 package travel;
 
 import java.util.Objects;
+import exceptions.InvalidTransportDataException;
 
 
 /**
@@ -11,17 +12,11 @@ import java.util.Objects;
 
 public abstract class  Transportation {
 
-    // Unique identifier for each transportation object
-    private String transportId;
-
-    // Name of the company providing the transportation
-    private String companyName;
-
-    // City from which the transportation departs
-    private String departureCity;
-
-    // City where the transportation arrives
-    private String arrivalCity;
+    protected String transportId;
+    protected String companyName;
+    protected String departureCity;
+    protected String arrivalCity;
+    protected double price; // Added to match the CSV data structure
 
     // Static counter to generate unique transport IDs
     private static int idCounter = 3001;
@@ -30,15 +25,16 @@ public abstract class  Transportation {
      * Default constructor.
      * Initializes transportId with a unique ID and sets other fields to empty strings.
      */
-    public Transportation() {
+    public Transportation() throws InvalidTransportDataException {
         // Generate unique ID
         // Increment counter for next object
         this.transportId = "TR" + idCounter;
         idCounter++;
 
-        this.companyName = "";
-        this.departureCity = "";
-        this.arrivalCity = "";
+        this.companyName = "Unknown";
+        this.departureCity = "Unknown";
+        this.arrivalCity = "Unknown";
+        this.price = 0.0;
     }
 
     /**
@@ -49,7 +45,7 @@ public abstract class  Transportation {
      * @param arrivalCity Arrival city
      */
     public Transportation (String companyName,
-                          String departureCity, String arrivalCity) {
+                          String departureCity, String arrivalCity,double price) throws InvalidTransportDataException {
 
         // Generate unique ID
         this.transportId = "TR" + idCounter;
@@ -58,6 +54,7 @@ public abstract class  Transportation {
         this.companyName = companyName;
         this.departureCity = departureCity;
         this.arrivalCity = arrivalCity;
+        this.price = price;
     }
 
     /**
@@ -65,13 +62,31 @@ public abstract class  Transportation {
      * Creates a new transportation object by copying the details from another object.
      * @param other Another Transportation object
      */
-    public Transportation (Transportation other) {
+    public Transportation (Transportation other) throws InvalidTransportDataException {
+
+        if (other == null) {
+            throw new InvalidTransportDataException("Cannot copy a null transportation object.");
+        }
 
         // Generate new unique ID
         this.transportId = "TR" + idCounter++;
         this.companyName = other.companyName;
         this.departureCity = other.departureCity;
         this.arrivalCity = other.arrivalCity;
+        this.price = other.price;
+    }
+
+    /**
+     * Parameterized constructor for loading data from files (CSV).
+     * Takes an existing ID instead of auto-generating one.
+     */
+    public Transportation(String transportId, String companyName, String departureCity, String arrivalCity, double price) throws InvalidTransportDataException {
+        this.transportId = transportId;
+
+        this.companyName = companyName;
+        this.departureCity = departureCity;
+        this.arrivalCity = arrivalCity;
+        this.price = price;
     }
 
     // Getters and Setters
@@ -108,6 +123,12 @@ public abstract class  Transportation {
         this.arrivalCity = arrivalCity;
     }
 
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {this.price = price;}
+
 
     /**
      * Returns a string representation of the transportation object.
@@ -117,7 +138,8 @@ public abstract class  Transportation {
     public String toString() {
         return "ID: " + transportId +
                 ", Company: " + companyName +
-                ", Route: " + departureCity + " -> " + arrivalCity;
+                ", Route: " + departureCity + " -> " + arrivalCity +
+                ", Price: $" + price;
     }
 
     /**
@@ -132,7 +154,7 @@ public abstract class  Transportation {
         Transportation other = (Transportation) o;
         return  Objects.equals(companyName, other.companyName)
                 && Objects.equals(departureCity, other.departureCity)
-                && Objects.equals(arrivalCity, other.arrivalCity);
+                && Objects.equals(arrivalCity, other.arrivalCity) && Double.compare(other.price, price) == 0;
     }
 
     /**
