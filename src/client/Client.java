@@ -1,6 +1,7 @@
 package client;
 
 import exceptions.InvalidClientDataException;
+
 import java.util.Objects;
 
 /**
@@ -23,15 +24,13 @@ public class Client {
      * Creates a client with empty fields and an auto-generated ID.
      */
 
-    public Client() throws  InvalidClientDataException {
+    public Client() {
         this.clientId = "C" + idCounter;
         idCounter++;
 
-        setFirstName("Unknown");
-        setLastName("Unknown");
-        setEmail("unknown@gmail.com");
-        this.amountSpent = 0.0;
-
+        this.firstName = "";
+        this.lastName = "";
+        this.email = "";
     }
 
     /**
@@ -57,15 +56,17 @@ public class Client {
      * Creates a new Client object based on another Client.
      * A new unique ID is generated.
      */
-    public Client (Client other) throws InvalidClientDataException {
+    public Client (Client other) throws  InvalidClientDataException {
         this.clientId = "C" + idCounter;
         idCounter++;
 
-        setFirstName(other.firstName);
-        setLastName(other.lastName);
-        setEmail(other.email);
-        this.amountSpent = other.amountSpent;
+        this.firstName = other.firstName;
+        this.lastName = other.lastName;
+        this.email = other.email;
 
+    }
+
+    public Client(String id, String firstName, String lastName, String email) throws InvalidClientDataException {
     }
 
     // Getters and Setters
@@ -128,7 +129,7 @@ public class Client {
         return "Client Info: " +
                 "[ID: " + clientId +
                 ", Name: " + firstName + " " + lastName +
-                ", Email: " + email + ", Total Amount Spent: " + amountSpent + "]";
+                ", Email: " + email + "]";
     }
 
     /**
@@ -142,8 +143,7 @@ public class Client {
         return Objects.equals(clientId, other.clientId) &&
                 Objects.equals(firstName, other.firstName) &&
                 Objects.equals(lastName, other.lastName) &&
-                Objects.equals(email, other.email) &&
-                Double.compare(amountSpent, other.amountSpent) == 0;
+                Objects.equals(email, other.email);
     }
 
 

@@ -3,6 +3,8 @@ package visualization;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+
+import exceptions.InvalidAccommodationDataException;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
@@ -14,6 +16,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+import service.SmartTravelService;
 import travel.Trip;
 
 import java.io.File;
@@ -84,7 +87,7 @@ public class TripChartGenerator {
      * @param count number of valid elements in the array
      * @throws IOException if PNG file cannot be written
      */
-    public static void generateCostBarChart(Trip[] trips, int count) throws IOException {
+    public static void generateCostBarChart(Trip[] trips, int count) throws IOException, InvalidAccommodationDataException {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         for (int i = 0; i < count; i++) {
             dataset.addValue(trips[i].calculateTotalCost(), "Total Cost", trips[i].getTripId());
@@ -163,5 +166,14 @@ public class TripChartGenerator {
         renderer.setSeriesShapesFilled(0, true);
         
         ChartUtils.saveChartAsPNG(new File("output/trip_duration_line_chart.png"), chart, 800, 600);
+    }
+
+    public static void generateDestinationPieChart(SmartTravelService service) {
+    }
+
+    public static void generateDurationLineChart(SmartTravelService service) {
+    }
+
+    public static void generateCostBarChart(SmartTravelService service) {
     }
 }

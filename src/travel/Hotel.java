@@ -11,15 +11,14 @@ import java.util.Objects;
  */
 public class Hotel extends Accommodation {
 
-    private int starRating;
 
     /**
      * Default constructor.
      * Calls parent constructor and initializes starRating to 0.
      */
-    public Hotel() {
+    public Hotel() throws  InvalidAccommodationDataException {
         super();
-        this.starRating = 0;
+
     }
 
     /**
@@ -27,55 +26,34 @@ public class Hotel extends Accommodation {
      * Initializes hotel name, location, price per night, and star rating.
      */
     public Hotel(String name, String location, double pricePerNight, int starRating) throws InvalidAccommodationDataException {
-        super(name, location, pricePerNight);
-        setStarRating(starRating);
+        super(name, location, pricePerNight, starRating);
+    }
+
+    /**
+     * Parameterized constructor for loading data from files (CSV).
+     * Takes an existing ID instead of auto-generating one.
+     */
+    public Hotel(String accommodationId, String name, String location, double pricePerNight, int stars) throws InvalidAccommodationDataException {
+        super(accommodationId, name, location, pricePerNight, stars);
     }
 
     /**
      * Copy constructor.
      * Creates a new Hotel object based on another Hotel.
      */
-    public Hotel(Hotel other) {
+    public Hotel(Hotel other) throws InvalidAccommodationDataException {
         super(other);
-        this.starRating = other.starRating;
     }
 
-    // Getters and Setters
-
-    public int getStarRating() {
-        return starRating;
-    }
-
-    public void setStarRating(int stars) throws InvalidAccommodationDataException {
-        // Rule: Stars 1-5
-        if (stars < 1 || stars > 5) {
-            throw new InvalidAccommodationDataException("Star rating must be between 1 and 5.");
-        }
-        this.starRating = stars;
-    }
 
     /**
      * Returns a formatted string representation of the Hotel.
      */
     @Override
     public String toString() {
-        return "Hotel [" + super.toString() +
-                ", Stars: " + starRating + "]";
+        return "Hotel [" + super.toString() +"]";
     }
 
-    /**
-     * Overrides equals method.
-     * Two Hotels are equal if:
-     * - Their parent attributes are equal
-     * - They have the same star rating
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Hotel other = (Hotel) o;
-        return starRating == other.starRating;
-    }
 
     /**
      * Calculates the cost of staying in the hotel.

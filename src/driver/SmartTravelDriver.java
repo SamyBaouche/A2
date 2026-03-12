@@ -1,6 +1,10 @@
 package driver;
 
 import client.Client;
+import exceptions.InvalidAccommodationDataException;
+import exceptions.InvalidClientDataException;
+import exceptions.InvalidTransportDataException;
+import exceptions.InvalidTripDataException;
 import travel.*;
 
 import java.util.Scanner;
@@ -50,7 +54,7 @@ public class SmartTravelDriver {
      * Main driver class for Smart Travel Planner application.
      * Handles user interaction via menu or predefined scenario.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidAccommodationDataException, InvalidTripDataException, InvalidTransportDataException {
 
         System.out.println();
         System.out.println("Welcome to SmartTravelPlanner by: \n" +
@@ -97,7 +101,21 @@ public class SmartTravelDriver {
                             System.out.println();
                             additionalOperations();
                         }
-
+                        case 6 -> {
+                            System.out.println();
+                        }
+                        case 7 -> {
+                            System.out.println();
+                        }
+                        case 8 -> {
+                            System.out.println();
+                        }
+                        case 9 -> {
+                            System.out.println();
+                        }
+                        case 10 -> {
+                            System.out.println();
+                        }
                         case 0 -> {
                             System.out.println("Thank you for using our Smart Travel Planner");
                         }
@@ -128,6 +146,11 @@ public class SmartTravelDriver {
             System.out.println("3. Transportation Management");
             System.out.println("4. Accomodation Management");
             System.out.println("5. Additional Operations");
+            System.out.println("6. List All Data Summary");
+            System.out.println("7. Load All Data");
+            System.out.println("8. Save All Data");
+            System.out.println("9. Run Predefined Scenario");
+            System.out.println("10. Generate Dashboard");
             System.out.println("0. Exit");
             System.out.print("> ");
 
@@ -138,7 +161,7 @@ public class SmartTravelDriver {
     }
 
     // --- Additional Operations ---
-    public static void mostExpensiveTrip(Trip[] trips) {
+    public static void mostExpensiveTrip(Trip[] trips) throws InvalidAccommodationDataException, InvalidTripDataException {
 
         if (trips.length != 0) {
             double topPrice = 0;
@@ -162,7 +185,7 @@ public class SmartTravelDriver {
     /**
      * Creates a deep copy of a transportation array.
      */
-    public static Transportation[] copyTransportationArray(Transportation[] original) {
+    public static Transportation[] copyTransportationArray(Transportation[] original) throws InvalidTransportDataException {
 
         Transportation[] copy = new Transportation[original.length];
 
@@ -183,7 +206,7 @@ public class SmartTravelDriver {
     /**
      * Creates a deep copy of an accommodation array.
      */
-    public static Accommodation[] copyAccommodationArray(Accommodation[] original) {
+    public static Accommodation[] copyAccommodationArray(Accommodation[] original) throws InvalidAccommodationDataException {
 
         Accommodation[] copy = new Accommodation[original.length];
 
@@ -275,7 +298,7 @@ public class SmartTravelDriver {
      * editClient(): Allows user to select a client and update their information.
      */
 
-    public static void editClient() {
+    public static void editClient() throws InvalidClientDataException {
         if (clients.length == 0) {
             System.out.println("There is no client to edit.");
         } else {
@@ -399,7 +422,7 @@ public class SmartTravelDriver {
      * a client, accommodation, and transportation.
      * Adds the trip to the trips array.
      */
-    public static void createTrip() {
+    public static void createTrip() throws InvalidClientDataException {
 
         Accommodation accomodation = null;
         Transportation transportation = null;
@@ -871,7 +894,7 @@ public class SmartTravelDriver {
      * 4 - Create a deep copy of the accommodation array
      */
 
-    public static void additionalOperations() {
+    public static void additionalOperations() throws InvalidAccommodationDataException, InvalidTransportDataException, InvalidTripDataException {
 
         int choice;
 
@@ -946,7 +969,7 @@ public class SmartTravelDriver {
         }
     }
 
-    public static void predefinedScenario() {
+    public static void predefinedScenario() throws InvalidTransportDataException, InvalidAccommodationDataException {
         System.out.println("\n      1. Creating... \n" +
                 "- 3 Clients \n" +
                 "- 3 Trips \n" +
