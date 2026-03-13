@@ -216,4 +216,14 @@ public class Trip {
         }
         this.accommodation = accommodation;
     }
+
+    public static void updateIdCounter(String lastId) {
+        // Strip the "T" and convert to int
+        int idNum = Integer.parseInt(lastId.substring(1));
+
+        // Update the tripIdCounter to match the highest from the file
+        if (idNum > tripIdCounter) {
+            tripIdCounter = idNum;
+        }
+    }
 }
