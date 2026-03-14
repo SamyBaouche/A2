@@ -49,9 +49,16 @@ public class SmartTravelService {
         if (clients.length == 0) {
             System.out.println("There is no client to edit.");
         } else {
-            int choice = choiceCheckClient("edit", true);
+            String id = choiceCheckClient("edit", true);
 
-            if (choice != clients.length) {
+            if (!id.equals("0")) {
+
+                int choice = 0;
+
+                for (int i = 0; i < clients.length; i++) {
+                    if (clients[i].getClientId().equals(id))
+                        choice = i;
+                }
 
                 System.out.print("Enter new client First Name > ");
                 String firstName = sc.nextLine();
@@ -77,9 +84,9 @@ public class SmartTravelService {
         if (clients.length == 0) {
             System.out.println("There is no client to delete.");
         } else {
-            int choice = choiceCheckClient("delete", true);
+            String id = choiceCheckClient("delete", true);
 
-            if (choice != clients.length) {
+            if (!id.equals("0")) {
 
                 Client[] smallerClient;
 
@@ -91,7 +98,7 @@ public class SmartTravelService {
                     int compteur = 0;
 
                     for (int i = 0; i < clients.length; i++) {
-                        if (i != choice) {
+                        if (!id.equalsIgnoreCase(clients[i].getClientId())) {
                             smallerClient[compteur++] = clients[i];
                         }
                     }
@@ -139,17 +146,33 @@ public class SmartTravelService {
         Client client = new Client();
 
         if (clients.length != 0) {
-            int choice = choiceCheckClient("associate to the trip", false);
+            String id = choiceCheckClient("associate to the trip", false);
+            int choice = 0;
+
+            for  (int i = 0; i < clients.length; i++) {
+                if (clients[i].getClientId().equalsIgnoreCase(id)) {
+                    choice = i;
+                }
+            }
 
             client = clients[choice];
+
         } else {
             System.out.println("No client to associate please create one and add it to the trip later");
         }
 
         if (accommodations.length != 0) {
-            int choice = choiceCheckAccommodation("associate to the trip", false);
+            String id = choiceCheckAccommodation("associate to the trip", false);
+            int choice = 0;
+
+            for  (int i = 0; i < accommodations.length; i++) {
+                if (accommodations[i].getAccommodationId().equalsIgnoreCase(id)) {
+                    choice = i;
+                }
+            }
 
             accomodation = accommodations[choice];
+
         } else {
             System.out.println("No accommodation to associate please create one and add it to the trip later");
         }
@@ -392,15 +415,15 @@ public class SmartTravelService {
             return;
         }
 
-        int choice = choiceCheckTransportation("remove", true);
+        String id = choiceCheckTransportation("remove", true);
 
-        if (choice != transportations.length) {
+        if (!id.equals("0")) {
 
             Transportation[] copyTransportations = new Transportation[transportations.length - 1];
 
             int compteur = 0;
             for (int i = 0; i < transportations.length; i++) {
-                if (i != choice) {
+                if (!id.equals(transportations[i].getTransportId())) {
                     copyTransportations[compteur++] = transportations[i];
                 }
             }
@@ -449,13 +472,15 @@ public class SmartTravelService {
                 accommodations = copyAccommodations;
                 System.out.println("Accommodation added successfully.");
             } case 2 -> {
+                System.out.print("Enter Star Rating: ");
+                int stars = sc.nextInt();
                 System.out.print("Enter Number of Shared Beds: ");
                 int beds = sc.nextInt();
                 Accommodation[] copyAccommodations = new Accommodation[accommodations.length + 1];
                 for (int i = 0; i < accommodations.length; i++) {
                     copyAccommodations[i] = accommodations[i];
                 }
-                copyAccommodations[copyAccommodations.length - 1] = new Hostel(name, location, price, beds);
+                copyAccommodations[copyAccommodations.length - 1] = new Hostel(name, location, price, stars, beds);
                 accommodations = copyAccommodations;
                 System.out.println("Accommodation added successfully.");
             }
@@ -472,16 +497,16 @@ public class SmartTravelService {
             return;
         }
 
-        int choice = choiceCheckAccommodation("remove", true);
+        String id = choiceCheckAccommodation("remove", true);
 
-        if (choice != accommodations.length) {
+        if (Integer.parseInt(id) != 0) {
 
             Accommodation[] copyAccommodations = new Accommodation[accommodations.length - 1];
 
             int compteur = 0;
 
             for (int i = 0; i < accommodations.length; i++) {
-                if (i != choice) {
+                if (!accommodations[i].getAccommodationId().equalsIgnoreCase(id)) {
                     copyAccommodations[compteur++] = accommodations[i];
                 }
             }
@@ -512,5 +537,113 @@ public class SmartTravelService {
         } else {
             System.out.println("There are no accommodations to list.");
         }
+    }
+
+    public static String choiceCheckClient(String action, boolean exit) {
+        String id;
+        boolean found = false;
+
+        do {
+            System.out.println("\nWhich client do you want to " + action + "?");
+            if (exit) {
+                System.out.print("Enter the id OR 0 to exit> ");
+                id = sc.nextLine();
+                if (id.equals("0"))
+                    break;
+            } else {
+                System.out.print("Enter the id > ");
+                id = sc.nextLine();
+            }
+
+            for (Client client: clients) {
+                if (client.getClientId().equalsIgnoreCase(id)) {
+                    found = true;
+                    break;
+                }
+            }
+        } while (!found);
+
+        return id;
+    }
+
+    public static String choiceCheckTrip(String action, boolean exit) {
+        String id;
+        boolean found = false;
+
+        do {
+            System.out.println("\nWhich trip do you want to " + action + "?");
+            if (exit) {
+                System.out.print("Enter the id OR 0 to exit> ");
+                id = sc.nextLine();
+                if (id.equals("0"))
+                    break;
+            } else {
+                System.out.print("Enter the id > ");
+                id = sc.nextLine();
+            }
+
+            for (Trip trip: trips) {
+                if (trip.getTripId().equalsIgnoreCase(id)) {
+                    found = true;
+                    break;
+                }
+            }
+        } while (!found);
+
+        return id;
+    }
+
+    public static String choiceCheckTransportation(String action, boolean exit) {
+        String id;
+        boolean found = false;
+
+        do {
+            System.out.println("\nWhich transportation do you want to " + action + "?");
+            if (exit) {
+                System.out.print("Enter the id OR 0 to exit> ");
+                id = sc.nextLine();
+                if (id.equals("0"))
+                    break;
+            } else {
+                System.out.print("Enter the id > ");
+                id = sc.nextLine();
+            }
+
+            for (Transportation trans: transportations) {
+                if (trans.getTransportId().equalsIgnoreCase(id)) {
+                    found = true;
+                    break;
+                }
+            }
+        } while (!found);
+
+        return id;
+    }
+
+    public static String choiceCheckAccommodation(String action, boolean exit) {
+        String id;
+        boolean found = false;
+
+        do {
+            System.out.println("\nWhich accommodation do you want to " + action + "?");
+            if (exit) {
+                System.out.print("Enter the id OR 0 to exit> ");
+                id = sc.nextLine();
+                if (id.equals("0"))
+                    break;
+            } else {
+                System.out.print("Enter the id > ");
+                id = sc.nextLine();
+            }
+
+            for (Accommodation acc: accommodations) {
+                if (acc.getAccommodationId().equalsIgnoreCase(id)) {
+                        found = true;
+                        break;
+                }
+            }
+        } while (!found);
+
+        return id;
     }
 }
