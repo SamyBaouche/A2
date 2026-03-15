@@ -28,8 +28,8 @@ public class Hostel extends Accommodation {
      * Parameterized constructor.
      * Initializes hostel information including shared beds.
      */
-    public Hostel(String name, String location, double pricePerNight, int stars, int sharedBeds) throws InvalidAccommodationDataException {
-        super(name, location, pricePerNight,stars);
+    public Hostel(String name, String location, double pricePerNight, int sharedBeds) throws InvalidAccommodationDataException {
+        super(name, location, pricePerNight);
         this.sharedBeds = sharedBeds;
     }
 
@@ -46,8 +46,8 @@ public class Hostel extends Accommodation {
      * Parameterized constructor for loading data from files (CSV).
      * Takes an existing ID instead of auto-generating one.
      */
-    public Hostel(String accommodationId, String name, String location, double pricePerNight, int stars, int sharedBeds) throws InvalidAccommodationDataException {
-        super(accommodationId, name, location, pricePerNight, stars);
+    public Hostel(String accommodationId, String name, String location, double pricePerNight, int sharedBeds) throws InvalidAccommodationDataException {
+        super(accommodationId, name, location, pricePerNight);
         this.sharedBeds = sharedBeds;
     }
 
@@ -108,7 +108,7 @@ public class Hostel extends Accommodation {
         if (numberOfDays < 1) {
             throw new InvalidAccommodationDataException("Number of nights must be at least 1");
         }
-        return (getPricePerNight() * numberOfDays) / sharedBeds;
+        return (pricePerNight * numberOfDays) / sharedBeds;
     }
 }
 

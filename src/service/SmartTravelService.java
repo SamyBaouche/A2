@@ -1,7 +1,7 @@
 package service;
 
 import client.Client;
-import exceptions.InvalidClientDataException;
+import exceptions.*;
 import travel.*;
 
 import java.util.Scanner;
@@ -20,32 +20,44 @@ public class SmartTravelService {
      */
 
     public static void addClient() {
-        System.out.print("Enter client First Name: ");
-        String firstName = sc.nextLine();
-        System.out.print("Enter client Last Name: ");
-        String lastName = sc.nextLine();
-        System.out.print("Enter client email: ");
-        String email = sc.nextLine();
 
-        Client client = new Client(firstName, lastName, email);
+        try {
+            System.out.print("Enter client First Name: ");
+            String firstName = sc.nextLine();
+            System.out.print("Enter client Last Name: ");
+            String lastName = sc.nextLine();
+            System.out.print("Enter client email: ");
+            String email = sc.nextLine();
 
-        Client[] clientProcess = new Client[clients.length + 1];
-
-        if (clients.length > 0) {
-            for (int i = 0; i < clients.length; i++) {
-                clientProcess[i] = clients[i];
+            for (Client client: clients) {
+                if (email.equals(client.getEmail())) {
+                    throw new DuplicateEmailException("This email is already associated to a client");
+                }
             }
-        }
 
-        clientProcess[clientProcess.length - 1] = client;
-        clients = clientProcess;
+            Client client = new Client(firstName, lastName, email);
+
+
+            Client[] clientProcess = new Client[clients.length + 1];
+
+            if (clients.length > 0) {
+                for (int i = 0; i < clients.length; i++) {
+                    clientProcess[i] = clients[i];
+                }
+            }
+
+            clientProcess[clientProcess.length - 1] = client;
+            clients = clientProcess;
+        } catch (InvalidClientDataException | DuplicateEmailException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     /**
      * editClient(): Allows user to select a client and update their information.
      */
 
-    public static void editClient() throws InvalidClientDataException {
+    public static void editClient() {
         if (clients.length == 0) {
             System.out.println("There is no client to edit.");
         } else {
@@ -60,17 +72,21 @@ public class SmartTravelService {
                         choice = i;
                 }
 
-                System.out.print("Enter new client First Name > ");
-                String firstName = sc.nextLine();
-                clients[choice].setFirstName(firstName);
+                try {
+                    System.out.print("Enter new client First Name > ");
+                    String firstName = sc.nextLine();
+                    clients[choice].setFirstName(firstName);
 
-                System.out.print("Enter new client Last Name > ");
-                String lastName = sc.nextLine();
-                clients[choice].setLastName(lastName);
+                    System.out.print("Enter new client Last Name > ");
+                    String lastName = sc.nextLine();
+                    clients[choice].setLastName(lastName);
 
-                System.out.print("Enter new client Email > ");
-                String email = sc.nextLine();
-                clients[choice].setEmail(email);
+                    System.out.print("Enter new client Email > ");
+                    String email = sc.nextLine();
+                    clients[choice].setEmail(email);
+                } catch (InvalidClientDataException e) {
+                    System.err.println(e.getMessage());
+                }
             }
 
         }
@@ -129,7 +145,7 @@ public class SmartTravelService {
      * a client, accommodation, and transportation.
      * Adds the trip to the trips array.
      */
-    public static void createTrip() throws InvalidClientDataException {
+    public static void createTrip() {
 
         Accommodation accomodation = null;
         Transportation transportation = null;
@@ -178,26 +194,38 @@ public class SmartTravelService {
         }
 
         if (transportations.length != 0) {
-            int choice = choiceCheckTransportation("associate to the trip", false);
+            String choice = choiceCheckTransportation("associate to the trip", false);
+            int index = 0;
 
-            transportation = transportations[choice];
+            for  (int i = 0; i < transportations.length; i++) {
+                if (choice.equalsIgnoreCase(transportations[i].getTransportId())) {
+                    index = i;
+                }
+            }
+
+            transportation = transportations[index];
         } else {
             System.out.println("No transportation to associate please create one and add it to the trip later");
         }
 
-        Trip trip = new Trip (destination, daysDuration, price, client, accomodation, transportation);
+        try {
+            Trip trip = new Trip(destination, daysDuration, price, client, accomodation, transportation);
 
-        Trip[] tripsCopy = new Trip[trips.length + 1];
+            Trip[] tripsCopy = new Trip[trips.length + 1];
 
-        for (int i = 0; i < trips.length; i++) {
-            tripsCopy[i] = trips[i];
+            for (int i = 0; i < trips.length; i++) {
+                tripsCopy[i] = trips[i];
+            }
+
+            tripsCopy[tripsCopy.length - 1] = trip;
+
+            trips = tripsCopy;
+
+            System.out.println("New trip created successfully");
+
+        } catch (InvalidTripDataException e) {
+            System.err.println(e.getMessage());
         }
-
-        tripsCopy[tripsCopy.length - 1] = trip;
-
-        trips = tripsCopy;
-
-        System.out.println("New trip created successfully");
     }
 
     /**
@@ -206,9 +234,16 @@ public class SmartTravelService {
      */
     public static void editTripInformation() {
         if (trips.length != 0) {
-            int choice = choiceCheckTrip("edit", true);
+            String choice = choiceCheckTrip("edit", true);
 
-            if (choice != trips.length) {
+            int choiceTrip = 0;
+
+            for (int i = 0; i < trips.length; i++) {
+                if (trips[i].getTripId().equalsIgnoreCase(choice))
+                    choiceTrip = i;
+            }
+
+            if (!choice.equalsIgnoreCase("0")) {
 
                 System.out.print("Enter the new destination > ");
                 String destination = sc.nextLine();
@@ -222,27 +257,46 @@ public class SmartTravelService {
                 int choiceAccommodation = 0;
                 int choiceTransportation = 0;
 
+                String accId = "";
+                String transId = "";
+
                 if (accommodations.length != 0) {
-                    choiceAccommodation = choiceCheckAccommodation("associate to the trip", false);
+                    accId = choiceCheckAccommodation("associate to the trip", false);
+
+                    for (int i = 0; i < accommodations.length; i++) {
+                        if (accId.equalsIgnoreCase(accommodations[i].getAccommodationId())) {
+                            choiceAccommodation = i;
+                        }
+                    }
                 } else {
                     System.out.println("No accommodation registered add one and try again");
                 }
 
                 if (transportations.length != 0) {
-                    choiceTransportation = choiceCheckTransportation("associate to the trip", false);
+                    transId = choiceCheckTransportation("associate to the trip", false);
+
+                    for (int i = 0; i < transportations.length; i++) {
+                        if (transId.equalsIgnoreCase(transportations[i].getTransportId())) {
+                            choiceTransportation = i;
+                        }
+                    }
                 } else {
                     System.out.println("No transportation registered add one and try again");
                 }
 
-                trips[choice].setDestination(destination);
-                trips[choice].setDurationInDays(duration);
-                trips[choice].setBasePrice(price);
-                if (choiceAccommodation != accommodations.length && choiceTransportation != transportations.length) {
-                    trips[choice].setAccommodation(accommodations[choiceAccommodation]);
-                    trips[choice].setTransportation(transportations[choiceTransportation]);
-                }
+                try {
+                    trips[choiceTrip].setDestination(destination);
+                    trips[choiceTrip].setDurationInDays(duration);
+                    trips[choiceTrip].setBasePrice(price);
+                    if (choiceAccommodation != accommodations.length && choiceTransportation != transportations.length) {
+                        trips[choiceTrip].setAccommodation(accommodations[choiceAccommodation]);
+                        trips[choiceTrip].setTransportation(transportations[choiceTransportation]);
+                    }
 
-                System.out.println("Trip edited successfully");
+                    System.out.println("Trip edited successfully");
+                } catch (InvalidTripDataException e) {
+                    System.err.println(e.getMessage());
+                }
             }
 
         } else {
@@ -256,16 +310,23 @@ public class SmartTravelService {
      */
     public static void cancelTrip() {
         if (trips.length != 0) {
-            int choice = choiceCheckTrip("cancel", true);
+            String choice = choiceCheckTrip("cancel", true);
+            int index = 0;
 
-            Trip[] tripCopy = new Trip[trips.length - 1];
+            for (int i = 0; i < trips.length; i++) {
+                if (choice.equalsIgnoreCase(trips[i].getTripId())) {
+                    index = i;
+                }
+            }
 
-            if (choice != trips.length) {
+            if (!choice.equalsIgnoreCase("0")) {
+
+                Trip[] tripCopy = new Trip[trips.length - 1];
 
                 if (tripCopy.length != 0) {
                     int tripCopyCompteur = 0;
                     for (int i = 0; i < trips.length; i++) {
-                        if (i != choice) {
+                        if (i != index) {
                             tripCopy[tripCopyCompteur] = trips[i];
                             tripCopyCompteur++;
                         }
@@ -299,11 +360,18 @@ public class SmartTravelService {
      */
     public static void listAllTripsByClient() {
         if (trips.length != 0) {
-            int choice = choiceCheckClient("see the trips of", true);
+            String choice = choiceCheckClient("see the trips of", true);
+            int index = 0;
 
-            if (choice != trips.length) {
+            for (int i = 0; i < clients.length; i++) {
+                if (choice.equalsIgnoreCase(clients[i].getClientId())) {
+                    index = i;
+                }
+            }
+
+            if (!choice.equalsIgnoreCase("0")) {
                 for (Trip trip : trips) {
-                    if (trip.getClientAssociated() == clients[choice]) {
+                    if (trip.getClientAssociated() == clients[index]) {
                         System.out.println(trip);
                     }
                 }
@@ -342,28 +410,36 @@ public class SmartTravelService {
 
         switch (type) {
             case 1 -> {
-                System.out.print("Enter Luggage Allowance (kg): ");
-                double luggage = sc.nextDouble();
-                Transportation[] transportationCopy = new Transportation[transportations.length + 1];
-                for (int i = 0; i < transportations.length; i++) {
-                    transportationCopy[i] = transportations[i];
+                try {
+                    System.out.print("Enter Luggage Allowance (kg): ");
+                    double luggage = sc.nextDouble();
+                    Transportation[] transportationCopy = new Transportation[transportations.length + 1];
+                    for (int i = 0; i < transportations.length; i++) {
+                        transportationCopy[i] = transportations[i];
+                    }
+                    transportationCopy[transportationCopy.length - 1] = new Flight(company, departure, arrival, luggage);
+                    transportations = transportationCopy;
+                    System.out.println("Transportation added successfully.");
+                } catch (InvalidTransportDataException | NumberFormatException e) {
+                    System.err.println(e.getMessage());
                 }
-                transportationCopy[transportationCopy.length - 1] = new Flight(company, departure, arrival, luggage);
-                transportations = transportationCopy;
-                System.out.println("Transportation added successfully.");
             }
             case 2 -> {
                 System.out.print("Enter Train Type: ");
                 String trainType = sc.nextLine();
-                System.out.print("Enter Seat Class (Economy/First Class): ");
+                System.out.print("Enter Seat Class (Economy/Business): ");
                 String seatClass = sc.nextLine();
                 Transportation[] transportationCopy = new Transportation[transportations.length + 1];
                 for (int i = 0; i < transportations.length; i++) {
                     transportationCopy[i] = transportations[i];
                 }
-                transportationCopy[transportationCopy.length - 1] = new Train(company,departure,arrival,trainType,seatClass);
-                transportations = transportationCopy;
-                System.out.println("Transportation added successfully.");
+                try {
+                    transportationCopy[transportationCopy.length - 1] = new Train(company, departure, arrival, trainType, seatClass);
+                    transportations = transportationCopy;
+                    System.out.println("Transportation added successfully.");
+                } catch (InvalidTransportDataException e) {
+                    System.err.println(e.getMessage());
+                }
             }
             case 3 -> {
                 System.out.print("Enter Number of Stops: ");
@@ -372,9 +448,13 @@ public class SmartTravelService {
                 for (int i = 0; i < transportations.length; i++) {
                     transportationCopy[i] = transportations[i];
                 }
-                transportationCopy[transportationCopy.length - 1] = new Bus(company, departure, arrival, stops);
-                transportations = transportationCopy;
-                System.out.println("Transportation added successfully.");
+                try {
+                    transportationCopy[transportationCopy.length - 1] = new Bus(company, departure, arrival, stops);
+                    transportations = transportationCopy;
+                    System.out.println("Transportation added successfully.");
+                } catch (InvalidTransportDataException e) {
+                    System.err.println(e.getMessage());
+                }
             }
         }
     }
@@ -468,9 +548,13 @@ public class SmartTravelService {
                 for (int i = 0; i < accommodations.length; i++) {
                     copyAccommodations[i] = accommodations[i];
                 }
-                copyAccommodations[copyAccommodations.length - 1] = new Hotel(name, location, price, stars);
-                accommodations = copyAccommodations;
-                System.out.println("Accommodation added successfully.");
+                try {
+                    copyAccommodations[copyAccommodations.length - 1] = new Hotel(name, location, price, stars);
+                    accommodations = copyAccommodations;
+                    System.out.println("Accommodation added successfully.");
+                } catch (InvalidAccommodationDataException e) {
+                    System.err.println(e.getMessage());
+                }
             } case 2 -> {
                 System.out.print("Enter Star Rating: ");
                 int stars = sc.nextInt();
@@ -480,9 +564,13 @@ public class SmartTravelService {
                 for (int i = 0; i < accommodations.length; i++) {
                     copyAccommodations[i] = accommodations[i];
                 }
-                copyAccommodations[copyAccommodations.length - 1] = new Hostel(name, location, price, stars, beds);
-                accommodations = copyAccommodations;
-                System.out.println("Accommodation added successfully.");
+                try {
+                    copyAccommodations[copyAccommodations.length - 1] = new Hostel(name, location, stars, beds);
+                    accommodations = copyAccommodations;
+                    System.out.println("Accommodation added successfully.");
+                } catch (InvalidAccommodationDataException e) {
+                    System.err.println(e.getMessage());
+                }
             }
         }
     }

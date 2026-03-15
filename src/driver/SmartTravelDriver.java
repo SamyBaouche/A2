@@ -45,7 +45,7 @@ public class SmartTravelDriver {
     // Array with 1 Hotel and 1 Hostel
     static Accommodation[] accommodations = new Accommodation[] {
             new Hotel("Marriott", "Barcelona", 100, 4),
-            new Hostel("SleepInPeace", "Vancouver", 90, 3)
+            new Hostel("SleepInPeace", "Vancouver", 90, 3, 2)
     };
 
     static Trip[] trips = new Trip[0];

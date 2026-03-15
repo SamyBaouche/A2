@@ -11,6 +11,8 @@ import java.util.Objects;
  */
 public class Hotel extends Accommodation {
 
+    private int starRating;
+
 
     /**
      * Default constructor.
@@ -18,7 +20,7 @@ public class Hotel extends Accommodation {
      */
     public Hotel() throws  InvalidAccommodationDataException {
         super();
-
+        this.starRating = 1;
     }
 
     /**
@@ -26,7 +28,8 @@ public class Hotel extends Accommodation {
      * Initializes hotel name, location, price per night, and star rating.
      */
     public Hotel(String name, String location, double pricePerNight, int starRating) throws InvalidAccommodationDataException {
-        super(name, location, pricePerNight, starRating);
+        super(name, location, pricePerNight);
+        this.starRating = starRating;
     }
 
     /**
@@ -34,7 +37,8 @@ public class Hotel extends Accommodation {
      * Takes an existing ID instead of auto-generating one.
      */
     public Hotel(String accommodationId, String name, String location, double pricePerNight, int stars) throws InvalidAccommodationDataException {
-        super(accommodationId, name, location, pricePerNight, stars);
+        super(accommodationId, name, location, pricePerNight);
+        this.starRating = stars;
     }
 
     /**
@@ -43,8 +47,20 @@ public class Hotel extends Accommodation {
      */
     public Hotel(Hotel other) throws InvalidAccommodationDataException {
         super(other);
+        this.starRating = other.getStarRating();
     }
 
+    public int getStarRating() {
+        return starRating;
+    }
+
+    public void setStarRating(int starRating) throws InvalidAccommodationDataException{
+        // Rule: Stars 1-5
+        if (starRating < 1 || starRating > 5) {
+            throw new InvalidAccommodationDataException("Star rating must be between 1 and 5.");
+        }
+        this.starRating = starRating;
+    }
 
     /**
      * Returns a formatted string representation of the Hotel.

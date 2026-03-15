@@ -45,7 +45,7 @@ public abstract class  Transportation {
      * @param arrivalCity Arrival city
      */
     public Transportation (String companyName,
-                          String departureCity, String arrivalCity,double price) throws InvalidTransportDataException {
+                          String departureCity, String arrivalCity) throws InvalidTransportDataException {
 
         // Generate unique ID
         this.transportId = "TR" + idCounter;
@@ -54,7 +54,6 @@ public abstract class  Transportation {
         this.companyName = companyName;
         this.departureCity = departureCity;
         this.arrivalCity = arrivalCity;
-        this.price = price;
     }
 
     /**

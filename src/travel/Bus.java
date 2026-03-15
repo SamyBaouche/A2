@@ -36,9 +36,9 @@ public class Bus extends Transportation {
      * @param numberOfStops Number of stops during the trip
      */
     public Bus(String companyName, String departureCity,
-               String arrivalCity,double price, int numberOfStops) throws InvalidTransportDataException {
+               String arrivalCity, int numberOfStops) throws InvalidTransportDataException {
 
-        super(companyName, departureCity, arrivalCity,price);
+        super(companyName, departureCity, arrivalCity);
         setNumberOfStops(numberOfStops);
     }
 
@@ -107,7 +107,7 @@ public class Bus extends Transportation {
 
     @Override
     public double calculateCost(int numberOfDays) {
-        double cost = 0;
+        double cost;
 
         if (numberOfDays > 30) {
             cost = numberOfDays * DAILY_PASS_PRICE * DISCOUNT;

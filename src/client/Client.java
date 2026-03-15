@@ -42,6 +42,18 @@ public class Client {
     public Client(String firstName,
                   String lastName, String email) throws InvalidClientDataException {
 
+        if (firstName.isEmpty()) {
+            throw new InvalidClientDataException("Your first name must be non-empty");
+        } else if (firstName.length() > 50) {
+            throw new InvalidClientDataException("Your first name can't longer than 50 characters");
+        }
+
+        if (lastName.isEmpty()) {
+            throw new InvalidClientDataException("Your last name must be non-empty");
+        } else if (lastName.length() > 50) {
+            throw new InvalidClientDataException("Your last name can't be longer than 50 caracters");
+        }
+
         this.clientId = "C" + idCounter;
         idCounter++;
 
@@ -56,7 +68,7 @@ public class Client {
      * Creates a new Client object based on another Client.
      * A new unique ID is generated.
      */
-    public Client (Client other) throws  InvalidClientDataException {
+    public Client (Client other) {
         this.clientId = "C" + idCounter;
         idCounter++;
 
@@ -67,6 +79,27 @@ public class Client {
     }
 
     public Client(String id, String firstName, String lastName, String email) throws InvalidClientDataException {
+
+        if (firstName.isEmpty()) {
+            throw new InvalidClientDataException("Your first name must be non-empty");
+        } else if (firstName.length() > 50) {
+            throw new InvalidClientDataException("Your first name can't longer than 50 characters");
+        }
+
+        if (lastName.isEmpty()) {
+            throw new InvalidClientDataException("Your last name must be non-empty");
+        } else if (lastName.length() > 50) {
+            throw new InvalidClientDataException("Your last name can't be longer than 50 caracters");
+        }
+
+        if (email == null || email.length() > 100 || email.contains(" ") || !email.contains("@") || !email.contains(".")) {
+            throw new InvalidClientDataException("Invalid email format. Must contain @ and ., have no spaces, and be 100 characters or less.");
+        }
+
+        this.clientId = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
     }
 
     // Getters and Setters

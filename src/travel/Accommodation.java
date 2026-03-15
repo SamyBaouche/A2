@@ -10,7 +10,6 @@ public abstract class Accommodation {
     protected String name;
     protected String location;
     protected double pricePerNight;
-    protected int stars;
 
     private static int idCounter = 4001;
 
@@ -21,10 +20,9 @@ public abstract class Accommodation {
         this.name = "Unknown";
         this.location = "Unknown";
         setPricePerNight(1.0);
-        setStars(1);
     }
 
-    public Accommodation(String name, String location, double pricePerNight, int stars) throws InvalidAccommodationDataException{
+    public Accommodation(String name, String location, double pricePerNight) throws InvalidAccommodationDataException{
 
         this.accommodationId = "A" + idCounter;
         idCounter++;
@@ -32,7 +30,6 @@ public abstract class Accommodation {
         this.name = name;
         this.location = location;
         setPricePerNight(pricePerNight);
-        setStars(stars);
     }
 
     public Accommodation(Accommodation other) throws InvalidAccommodationDataException {
@@ -45,20 +42,18 @@ public abstract class Accommodation {
         this.name = other.name;
         this.location = other.location;
         setPricePerNight(other.pricePerNight);
-        setStars(other.stars);
     }
 
     /**
      * Parameterized constructor for loading data from files (CSV).
      * Takes an existing ID instead of auto-generating one.
      */
-    public Accommodation(String accommodationId, String name, String location, double pricePerNight, int stars) throws InvalidAccommodationDataException {
+    public Accommodation(String accommodationId, String name, String location, double pricePerNight) throws InvalidAccommodationDataException {
         this.accommodationId = accommodationId;
 
         this.name = name;
         this.location = location;
         setPricePerNight(pricePerNight);
-        setStars(stars);
     }
 
     public String getAccommodationId() {
@@ -89,24 +84,12 @@ public abstract class Accommodation {
         return pricePerNight;
     }
 
-    public int getStars() {
-        return stars;
-    }
-
     public void setPricePerNight(double pricePerNight) throws InvalidAccommodationDataException {
         // Rule: Price/night > $0
         if (pricePerNight <= 0) {
             throw new InvalidAccommodationDataException("Price per night must be greater than $0.");
         }
         this.pricePerNight = pricePerNight;
-    }
-
-    public void setStars(int stars) throws InvalidAccommodationDataException {
-        // Rule: Stars 1-5
-        if (stars < 1 || stars > 5) {
-            throw new InvalidAccommodationDataException("Star rating must be between 1 and 5.");
-        }
-        this.stars = stars;
     }
 
     @Override

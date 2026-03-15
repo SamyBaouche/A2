@@ -15,7 +15,7 @@ public class Flight extends Transportation {
     // Maximum luggage weight allowed (in kg)
     private double luggageAllowance;
 
-    //private final static double BASE_FLIGHT_PRICE = 400;
+    private final static double BASE_FLIGHT_PRICE = 400;
 
     /**
      * Default constructor.
@@ -35,9 +35,9 @@ public class Flight extends Transportation {
      * @param luggageAllowance Allowed luggage weight (kg)
      */
     public Flight(String companyName, String departureCity,
-                  String arrivalCity,double price, double luggageAllowance) throws InvalidTransportDataException {
+                  String arrivalCity, double luggageAllowance) throws InvalidTransportDataException {
 
-        super(companyName, departureCity, arrivalCity,price);
+        super(companyName, departureCity, arrivalCity);
         setLuggageAllowance(luggageAllowance);
     }
 
@@ -107,6 +107,6 @@ public class Flight extends Transportation {
     @Override
     public double calculateCost(int numberOfDays) {
         //Implemented luggageAllowance into the cost calcul
-        return getPrice() + (luggageAllowance * 1);
+        return BASE_FLIGHT_PRICE + (luggageAllowance * 1);
     }
 }

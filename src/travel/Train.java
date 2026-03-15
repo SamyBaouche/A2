@@ -12,8 +12,9 @@ import exceptions.InvalidTransportDataException;
 public class Train extends Transportation {
 
     private String trainType;
+    private String seatClass;
 
-    private final static double FIRST_CLASS_PRICE = 250;
+    private final static double BUSINESS_PRICE = 250;
     private final static double ECONOMY_PRICE = 75;
 
     /**
@@ -23,6 +24,7 @@ public class Train extends Transportation {
     public Train() throws InvalidTransportDataException {
         super();
         this.trainType = "Basic";
+        this.seatClass = "Economy";
     }
     /**
      * Parameterized constructor.
@@ -34,10 +36,12 @@ public class Train extends Transportation {
      * @param seatClass     Seat category (Economy / First Class)
      */
     public Train(String companyName, String departureCity,
-                 String arrivalCity,double price, String trainType, String seatClass) throws InvalidTransportDataException {
+                 String arrivalCity, String trainType, String seatClass) throws InvalidTransportDataException {
 
-        super(companyName, departureCity, arrivalCity,price);
+        super(companyName, departureCity, arrivalCity);
         this.trainType = trainType;
+        this.seatClass = seatClass;
+
     }
 
     /**
@@ -103,15 +107,20 @@ public class Train extends Transportation {
     /**
      * Calculates the cost of the train ticket based on seat class.
      * - Economy → ECONOMY_PRICE
-     * - First Class → FIRST_CLASS_PRICE
+     * - Business → FIRST_CLASS_PRICE
      *
      * @param numberOfDays not used (required by abstract method)
      * @return calculated ticket price
      */
     @Override
     public double calculateCost(int numberOfDays) {
+        double price = 0;
+        if (seatClass.equalsIgnoreCase("Economy")) {
+            price = ECONOMY_PRICE;
+        } else if (seatClass.equalsIgnoreCase("Business")) {
+            price = BUSINESS_PRICE;
+        }
 
-
-        return getPrice();
+        return price;
     }
 }
