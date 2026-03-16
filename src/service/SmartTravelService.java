@@ -4,6 +4,7 @@ import client.Client;
 import exceptions.*;
 import travel.*;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class SmartTravelService {
@@ -154,10 +155,10 @@ public class SmartTravelService {
         String destination = sc.nextLine();
 
         System.out.print("Enter duration days: ");
-        int daysDuration = sc.nextInt();
+        int daysDuration = valideIntegerInput();
 
         System.out.print("Enter base price: ");
-        double price = sc.nextDouble();
+        double price = valideDoubleInput();
 
         Client client = new Client();
 
@@ -249,16 +250,16 @@ public class SmartTravelService {
                 String destination = sc.nextLine();
 
                 System.out.print("Enter the new duration in days > ");
-                int duration = sc.nextInt();
+                int duration = valideIntegerInput();
 
                 System.out.print("Enter the new price > ");
-                double price = sc.nextDouble();
+                double price = valideDoubleInput();
 
                 int choiceAccommodation = 0;
                 int choiceTransportation = 0;
 
-                String accId = "";
-                String transId = "";
+                String accId;
+                String transId;
 
                 if (accommodations.length != 0) {
                     accId = choiceCheckAccommodation("associate to the trip", false);
@@ -396,7 +397,7 @@ public class SmartTravelService {
             System.out.println("2- Train");
             System.out.println("3- Bus");
             System.out.print("> ");
-            type = sc.nextInt();
+            type = valideIntegerInput();
             sc.nextLine();
         } while (type < 1 || type > 3);
 
@@ -412,7 +413,7 @@ public class SmartTravelService {
             case 1 -> {
                 try {
                     System.out.print("Enter Luggage Allowance (kg): ");
-                    double luggage = sc.nextDouble();
+                    double luggage = valideDoubleInput();
                     Transportation[] transportationCopy = new Transportation[transportations.length + 1];
                     for (int i = 0; i < transportations.length; i++) {
                         transportationCopy[i] = transportations[i];
@@ -443,7 +444,7 @@ public class SmartTravelService {
             }
             case 3 -> {
                 System.out.print("Enter Number of Stops: ");
-                int stops = sc.nextInt();
+                int stops = valideIntegerInput();
                 Transportation[] transportationCopy = new Transportation[transportations.length + 1];
                 for (int i = 0; i < transportations.length; i++) {
                     transportationCopy[i] = transportations[i];
@@ -526,7 +527,7 @@ public class SmartTravelService {
             System.out.println("Choose an accommodation type:");
             System.out.println("1. Hotel\n2. Hostel");
 
-            type = sc.nextInt();
+            type = valideIntegerInput();
 
             sc.nextLine();
         } while (type < 1 || type > 2);
@@ -538,12 +539,12 @@ public class SmartTravelService {
         String location = sc.nextLine();
 
         System.out.print("Price/night: ");
-        double price = sc.nextDouble();
+        double price = valideDoubleInput();
 
         switch (type) {
             case 1 -> {
                 System.out.print("Enter Star Rating: ");
-                int stars = sc.nextInt();
+                int stars = valideIntegerInput();
                 Accommodation[] copyAccommodations = new Accommodation[accommodations.length + 1];
                 for (int i = 0; i < accommodations.length; i++) {
                     copyAccommodations[i] = accommodations[i];
@@ -557,9 +558,9 @@ public class SmartTravelService {
                 }
             } case 2 -> {
                 System.out.print("Enter Star Rating: ");
-                int stars = sc.nextInt();
+                int stars = valideIntegerInput();
                 System.out.print("Enter Number of Shared Beds: ");
-                int beds = sc.nextInt();
+                int beds = valideIntegerInput();
                 Accommodation[] copyAccommodations = new Accommodation[accommodations.length + 1];
                 for (int i = 0; i < accommodations.length; i++) {
                     copyAccommodations[i] = accommodations[i];
@@ -733,5 +734,25 @@ public class SmartTravelService {
         } while (!found);
 
         return id;
+    }
+
+    public static int valideIntegerInput() {
+        while (true) {
+            try {
+                return sc.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Please type a valid number");
+            }
+        }
+    }
+
+    public static double valideDoubleInput() {
+        while (true) {
+            try {
+                return sc.nextDouble();
+            } catch (InputMismatchException e) {
+                System.out.println("Please type a valid number");
+            }
+        }
     }
 }
