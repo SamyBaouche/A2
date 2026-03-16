@@ -97,8 +97,7 @@ public abstract class Accommodation {
         return "ID: " + accommodationId +
                 ", Name: " + name +
                 ", Location: " + location +
-                ", Rate: $" + pricePerNight + "/night" +
-                ", Stars: " + stars;
+                ", Rate: $" + pricePerNight + "/night";
     }
 
     @Override
@@ -106,7 +105,6 @@ public abstract class Accommodation {
         if (o == null || getClass() != o.getClass()) return false;
         Accommodation other = (Accommodation) o;
         return Double.compare(other.pricePerNight, pricePerNight) == 0 &&
-                stars == other.stars &&
                 Objects.equals(name, other.name) &&
                 Objects.equals(location, other.location);
     }
@@ -115,12 +113,7 @@ public abstract class Accommodation {
      * Calculates the total cost for the accommodation.
      * Enforces the rule that the number of nights must be >= 1.
      */
-    public double calculateCost(int numberOfDays) throws InvalidAccommodationDataException {
-        if (numberOfDays < 1) {
-            throw new InvalidAccommodationDataException("Number of nights must be at least 1.");
-        }
-        return pricePerNight * numberOfDays;
-    }
+    public abstract double calculateCost(int numberOfDays) throws InvalidAccommodationDataException;
 
 
 }

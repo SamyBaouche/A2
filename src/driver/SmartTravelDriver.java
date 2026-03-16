@@ -12,7 +12,7 @@ import service.SmartTravelService;
 import java.util.Scanner;
 
 //-----------------------------------------------------
-// Assignment 1
+// Assignment 2
 // Question: 1 (only one)
 // Written by: Mohammed El Ouaabani 40338377, Samy Baouche 40336149
 //-----------------------------------------------------
@@ -101,7 +101,7 @@ public class SmartTravelDriver {
 
                         case 5 -> {
                             System.out.println();
-                            additionalOperations();
+                            SmartTravelService.additionalOperations();
                         }
                         case 6 -> {
                             System.out.println();
@@ -160,68 +160,6 @@ public class SmartTravelDriver {
         } while (choice < 0 || choice > 5);
 
         return choice;
-    }
-
-    // --- Additional Operations ---
-    public static void mostExpensiveTrip(Trip[] trips) throws InvalidAccommodationDataException, InvalidTripDataException {
-
-        if (trips.length != 0) {
-            double topPrice = 0;
-
-            Trip mostExpensiveTrip = new Trip();
-
-            for (Trip trip : trips) {
-                double costTrip = trip.calculateTotalCost();
-                if (costTrip > topPrice) {
-                    topPrice = costTrip;
-                    mostExpensiveTrip = trip;
-                }
-            }
-
-            System.out.println("The most expensive trip is: " + mostExpensiveTrip.getTripId());
-        } else {
-            System.out.println("There are no trips to compare");
-        }
-    }
-
-    /**
-     * Creates a deep copy of a transportation array.
-     */
-    public static Transportation[] copyTransportationArray(Transportation[] original) throws InvalidTransportDataException {
-
-        Transportation[] copy = new Transportation[original.length];
-
-        for (int i = 0; i < original.length; i++) {
-            if (original[i] instanceof Flight) {
-                copy[i] = new Flight((Flight) original[i]);
-            } else if (original[i] instanceof Train) {
-                copy[i] = new Train((Train) original[i]);
-            } else if (original[i] instanceof Bus) {
-                copy[i] = new Bus((Bus) original[i]);
-            }
-        }
-
-        return copy;
-
-    }
-
-    /**
-     * Creates a deep copy of an accommodation array.
-     */
-    public static Accommodation[] copyAccommodationArray(Accommodation[] original) throws InvalidAccommodationDataException {
-
-        Accommodation[] copy = new Accommodation[original.length];
-
-        for (int i = 0; i < original.length; i++) {
-            if (original[i] instanceof Hotel) {
-                copy[i] = new Hotel((Hotel) original[i]);
-            } else if (original[i] instanceof Hostel) {
-                copy[i] = new Hostel((Hostel) original[i]);
-            }
-        }
-
-        return copy;
-
     }
 
     /**
@@ -389,90 +327,6 @@ public class SmartTravelDriver {
         }
     }
 
-    /**
-     * additionalOperations(): Menu for extra operations outside the main CRUD menus.
-     * Options:
-     * 1 - Display the most expensive trip
-     * 2 - Calculate and display total cost of a specific trip
-     * 3 - Create a deep copy of the transportation array
-     * 4 - Create a deep copy of the accommodation array
-     */
-
-    public static void additionalOperations() throws InvalidAccommodationDataException, InvalidTransportDataException, InvalidTripDataException {
-
-        int choice;
-
-        do {
-            System.out.println("-- Additional Operations --\n");
-            System.out.println("1. Display the most expensive trip\n" +
-                    "2. Calculate and display the total cost of a trip\n" +
-                    "3. Create a deep copy of the transportation array\n" +
-                    "4. Create a deep copy of the accomodation array");
-            System.out.print("> ");
-
-            choice = sc.nextInt();
-            sc.nextLine();
-
-            switch (choice) {
-                case 1 -> {
-                    mostExpensiveTrip(trips);
-                } case 2 -> {
-                    totalCostOfATrip(trips);
-                } case 3 -> {
-
-                    if (transportations.length != 0) {
-                        Transportation[] copyTransportations = copyTransportationArray(transportations);
-
-                        System.out.println("Here is the deep copy of the transportation array");
-                        for (Transportation transportation : copyTransportations) {
-                            System.out.println(transportation);
-                        }
-                    } else {
-                        System.out.println("There are no transportations to copy");
-                    }
-
-                } case 4 -> {
-
-                    if (accommodations.length != 0) {
-                        Accommodation[] copyAccommodations = copyAccommodationArray(accommodations);
-
-                        System.out.println("Here is the deep copy of the accomodation array");
-                        for (Accommodation accommodation : copyAccommodations) {
-                            System.out.println(accommodation);
-                        }
-                    } else {
-                        System.out.println("There are no accomodations to copy");
-                    }
-
-                }
-            }
-
-        } while (choice < 0 || choice > 4);
-    }
-
-    /**
-     * totalCostOfATrip(Trip[] trips):
-     * Allows the user to select a trip and calculates its total cost.
-     * The cost is calculated using the Trip object's calculateTotalCost() method.
-     * If no trips exist, informs the user.
-     */
-    public static void totalCostOfATrip(Trip[] trips) {
-        if (trips.length == 0) {
-            System.out.println("There is no trip stored.");
-        } else {
-            int choice;
-            do {
-                System.out.println("Which trip do you want to calculate the cost of? :");
-                for (int i = 0; i < trips.length; i++) {
-                    System.out.println((i + 1) + ". " + trips[i].getTripId());
-                }
-                choice = sc.nextInt();
-            } while (choice < 1 || choice > trips.length);
-
-            System.out.println("Total cost of trip [" + trips[choice - 1].getTripId() + "]" + trips[choice -1].calculateTotalCost());
-        }
-    }
-
     public static void predefinedScenario() throws InvalidTransportDataException, InvalidAccommodationDataException {
         System.out.println("\n      1. Creating... \n" +
                 "- 3 Clients \n" +
@@ -560,12 +414,12 @@ public class SmartTravelDriver {
         }
 
         System.out.println("\n      5. Most expensive Trip\n" );
-        mostExpensiveTrip(tripsPredef);
+        SmartTravelService.mostExpensiveTrip(tripsPredef);
 
         System.out.println("\n      6. Deep copie of the Transportation Array\n");
 
         System.out.println("Making the deep copy...\n");
-        Transportation[] transportationsCopy = copyTransportationArray(transportationsPredef);
+        Transportation[] transportationsCopy = SmartTravelService.copyTransportationArray(transportationsPredef);
 
         System.out.println("-- Displaying both Arrays --\n");
         System.out.println("Original");

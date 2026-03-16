@@ -99,12 +99,16 @@ public class Trip {
      * Includes base price, accommodation cost, and transportation cost.
      */
 
-    public double calculateTotalCost() throws InvalidAccommodationDataException {
+    public double calculateTotalCost() {
         double cost = 0;
         cost += basePrice;
 
         if (accommodation != null) {
-            cost += accommodation.calculateCost(durationInDays);
+            try {
+                cost += accommodation.calculateCost(durationInDays);
+            } catch (InvalidAccommodationDataException e) {
+                System.err.println(e.getMessage());
+            }
         }
 
         if (transportation != null) {
