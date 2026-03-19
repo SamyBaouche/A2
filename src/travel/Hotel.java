@@ -82,4 +82,5 @@ public class Hotel extends Accommodation {
         }
         return getPricePerNight() * numberOfDays;
     }
+
 }

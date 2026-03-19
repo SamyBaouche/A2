@@ -8,6 +8,7 @@ import exceptions.InvalidTripDataException;
 import travel.*;
 
 import service.SmartTravelService;
+import visualization.DashboardGenerator;
 
 import java.util.Scanner;
 
@@ -32,21 +33,45 @@ public class SmartTravelDriver {
 
     static Scanner sc = new Scanner(System.in);
 
-    static Client[] clients = new Client[] {
-            new Client("momo", "elbn", "m.elbn@gmail.com")
-    };
+    static Client[] clients;
+
+    static {
+        try {
+            clients = new Client[] {
+                    new Client("momo", "elbn", "m.elbn@gmail.com")
+            };
+        } catch (InvalidClientDataException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     // Array size 0
-    static Transportation[] transportations = new Transportation[] {
-            new Flight("Air Canada", "Laval", "Vancouver", 22),
-            new Train("Train", "Laval", "Mtl", "Bullet", "Economy")
-    };
+    static Transportation[] transportations;
+
+    static {
+        try {
+            transportations = new Transportation[] {
+                    new Flight("Air Canada", "Laval", "Vancouver", 22),
+                    new Train("Train", "Laval", "Mtl", "Bullet", "Economy")
+            };
+        } catch (InvalidTransportDataException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     // Array with 1 Hotel and 1 Hostel
-    static Accommodation[] accommodations = new Accommodation[] {
-            new Hotel("Marriott", "Barcelona", 100, 4),
-            new Hostel("SleepInPeace", "Vancouver", 90, 3, 2)
-    };
+    static Accommodation[] accommodations;
+
+    static {
+        try {
+            accommodations = new Accommodation[] {
+                    new Hotel("Marriott", "Barcelona", 100, 4),
+                    new Hostel("SleepInPeace", "Vancouver", 90, 3, 2)
+            };
+        } catch (InvalidAccommodationDataException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     static Trip[] trips = new Trip[0];
 
@@ -56,7 +81,7 @@ public class SmartTravelDriver {
      * Main driver class for Smart Travel Planner application.
      * Handles user interaction via menu or predefined scenario.
      */
-    public static void main(String[] args) throws InvalidAccommodationDataException, InvalidTripDataException, InvalidTransportDataException {
+    public static void main(String[] args) throws InvalidAccommodationDataException, InvalidTripDataException, InvalidTransportDataException, InvalidClientDataException {
 
         System.out.println();
         System.out.println("Welcome to SmartTravelPlanner by: \n" +
@@ -105,18 +130,23 @@ public class SmartTravelDriver {
                         }
                         case 6 -> {
                             System.out.println();
+                            SmartTravelService.listAllTrips();
                         }
                         case 7 -> {
                             System.out.println();
+                            SmartTravelService.loadAllData("output/data/");
                         }
                         case 8 -> {
                             System.out.println();
+                            SmartTravelService.saveAllData("output/data/");
                         }
                         case 9 -> {
                             System.out.println();
+                            predefinedScenario();
                         }
                         case 10 -> {
                             System.out.println();
+                            //visualization.DashboardGenerator.generateDashboard();
                         }
                         case 0 -> {
                             System.out.println("Thank you for using our Smart Travel Planner");
@@ -157,7 +187,7 @@ public class SmartTravelDriver {
             System.out.print("> ");
 
             choice = sc.nextInt();
-        } while (choice < 0 || choice > 5);
+        } while (choice < 0 || choice > 10);
 
         return choice;
     }
@@ -327,7 +357,7 @@ public class SmartTravelDriver {
         }
     }
 
-    public static void predefinedScenario() throws InvalidTransportDataException, InvalidAccommodationDataException {
+    public static void predefinedScenario() throws InvalidTransportDataException, InvalidAccommodationDataException, InvalidClientDataException, InvalidTripDataException {
         System.out.println("\n      1. Creating... \n" +
                 "- 3 Clients \n" +
                 "- 3 Trips \n" +

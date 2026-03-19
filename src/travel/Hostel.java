@@ -2,8 +2,6 @@ package travel;
 
 import exceptions.InvalidAccommodationDataException;
 
-import java.util.Objects;
-
 
 /**
  * The Hostel class represents a type of Accommodation
@@ -19,7 +17,7 @@ public class Hostel extends Accommodation {
      * Default constructor.
      * Calls the parent constructor and initializes sharedBeds to 0.
      */
-    public Hostel() throws  InvalidAccommodationDataException {
+    public Hostel(String sleepInPeace, String vancouver, int i, int pricePerNight, int sharedBeds) throws  InvalidAccommodationDataException {
         super();
         this.sharedBeds = 1;
     }

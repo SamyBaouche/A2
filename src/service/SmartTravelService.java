@@ -2,8 +2,13 @@ package service;
 
 import client.Client;
 import exceptions.*;
+import persistence.AccommodationFileManager;
+import persistence.ClientFileManager;
+import persistence.TransportFileManager;
+import persistence.TripFileManager;
 import travel.*;
 
+import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -11,10 +16,68 @@ public class SmartTravelService {
 
     static Scanner sc = new Scanner(System.in);
 
-    private static Client[] clients;
-    private static Trip[] trips;
-    private static Accommodation[] accommodations;
-    private static Transportation[] transportations;
+    private static Client[] clients = new Client[100];
+    private static Trip[] trips = new Trip[200];
+    private static Accommodation[] accommodations = new Accommodation[50];
+    private static Transportation[] transportations = new Transportation[50];
+
+    private static int clientCount = 0;
+    private static int tripCount = 0;
+    private static int accommodationCount = 0;
+    private static int transportationCount = 0;
+
+    public static void loadAllData(String directory){
+        try {
+            clientCount = ClientFileManager.loadClients(clients,"clients.csv");
+            accommodationCount = AccommodationFileManager.loadAccommodations(accommodations,"accommodations.csv");
+            transportationCount = TransportFileManager.loadTransportations(transportations, "transports.csv");
+            tripCount = TripFileManager.loadTrips(trips,"trips.csv",clients,accommodations,transportations);
+
+            System.out.println("All data loaded !");
+        } catch (IOException e) {
+            System.out.println("Something went wrong when loading all data !");
+        }
+    }
+
+    public static void saveAllData(String directory){
+        try {
+            ClientFileManager.saveClients(clients,clientCount,"clients.csv");
+            AccommodationFileManager.saveAccommodations(accommodations,accommodationCount,"accommodations.csv");
+            TransportFileManager.saveTransportations(transportations,transportationCount,"transports.csv");
+            TripFileManager.saveTrips(trips,tripCount,"trips.csv");
+
+            System.out.println("All data saved !");
+
+        } catch (IOException e) {
+            System.out.println("Something went wrong when saving all data !");
+        }
+    }
+
+    public static boolean clientExists(String email) {
+        for (int i = 0; i < clientCount; i++) {
+            if (clients[i].getEmail().equalsIgnoreCase(email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Client findClientById(String id) throws EntityNotFoundException {
+        for (int i = 0; i < clientCount; i++) {
+            if (clients[i].getClientId().equalsIgnoreCase(id)) {
+                return clients[i];
+            }
+        }
+        throw new EntityNotFoundException("Client with ID " + id + " was not found.");
+    }
+
+    public static double calculateTripTotal(int index) {
+        if (index >= 0 && index < tripCount) {
+            return trips[index].calculateTotalCost();
+        }
+        return 0.0;
+    }
+
 
     /**
      * addClient(): Prompts user for client information and adds it to the client array.

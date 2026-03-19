@@ -60,7 +60,7 @@ public class TripFileManager {
         pw.close();
     }
 
-    public static void loadTrips(Trip[] trips, String filePath, Client[] clients, Accommodation[] acc, Transportation[] trans) throws IOException {
+    public static int loadTrips(Trip[] trips, String filePath, Client[] clients, Accommodation[] acc, Transportation[] trans) throws IOException {
         Scanner inFile = null;
         boolean fileFound = true;
 
