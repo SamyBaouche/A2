@@ -92,7 +92,7 @@ public class SmartTravelDriver {
                 "   2- Predefined testing scenario \n" +
                 "Enter your choice > ");
 
-        int optionChoice = sc.nextInt();
+        int optionChoice = SmartTravelService.valideIntegerInput();
 
         switch (optionChoice) {
 
@@ -186,7 +186,7 @@ public class SmartTravelDriver {
             System.out.println("0. Exit");
             System.out.print("> ");
 
-            choice = sc.nextInt();
+            choice = SmartTravelService.valideIntegerInput();
         } while (choice < 0 || choice > 10);
 
         return choice;
@@ -213,7 +213,7 @@ public class SmartTravelDriver {
                     "0. Exit to main menu");
             System.out.print("> ");
 
-            choice = sc.nextInt();
+            choice = SmartTravelService.valideIntegerInput();
             sc.nextLine();
         } while (choice < 0 || choice > 4);
 
@@ -254,7 +254,7 @@ public class SmartTravelDriver {
                     "0. Exit to main menu");
             System.out.print("> ");
 
-            choice = sc.nextInt();
+            choice = SmartTravelService.valideIntegerInput();
             sc.nextLine();
         } while (choice < 0 || choice > 5);
 
@@ -301,7 +301,7 @@ public class SmartTravelDriver {
                     "0. Exit to main menu");
             System.out.print("> ");
 
-            choice = sc.nextInt();
+            choice = SmartTravelService.valideIntegerInput();
             sc.nextLine();
         } while (choice < 0 || choice > 3);
 
@@ -336,7 +336,7 @@ public class SmartTravelDriver {
                     "0. Exit to main menu");
             System.out.print("> ");
 
-            choice = sc.nextInt();
+            choice = SmartTravelService.valideIntegerInput();
             sc.nextLine();
         } while (choice < 0 || choice > 3);
 
