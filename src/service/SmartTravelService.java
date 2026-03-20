@@ -26,7 +26,7 @@ public class SmartTravelService {
             clients = ClientFileManager.loadClients("output/data/clients.csv");
             accommodations = AccommodationFileManager.loadAccommodations("output/data/accommodations.csv");
             transportations = TransportFileManager.loadTransportations("output/data/transports.csv");
-            TripFileManager.loadTrips(trips,"output/data/trips.csv",clients,accommodations,transportations);
+            trips = TripFileManager.loadTrips("output/data/trips.csv",clients,accommodations,transportations);
 
             System.out.println("All data loaded !");
         } catch (IOException e) {
@@ -123,7 +123,11 @@ public class SmartTravelService {
 
                     System.out.print("Enter new client Email > ");
                     String email = sc.nextLine();
-                    clients[choice].setEmail(email);
+                    try {
+                        clients[choice].setEmail(email);
+                    } catch (DuplicateEmailException e) {
+                        System.err.println(e.getMessage());
+                    }
                 } catch (InvalidClientDataException e) {
                     System.err.println(e.getMessage());
                 }
@@ -210,21 +214,17 @@ public class SmartTravelService {
 
         if (clients.length != 0) {
             String id = "";
-            boolean clientFound = false;
 
-            do {
-                try {
-                    id = choiceCheckClient("associate to the trip", true);
+            try {
+                id = choiceCheckClient("associate to the trip", true);
 
-                    if (id.equals("0"))
-                        return;
+                if (id.equals("0"))
+                    return;
 
-                    clientFound = true;
-                } catch (EntityNotFoundException e) {
-                    System.err.println(e.getMessage());
-                    System.out.println("A trip must have a client associated try again.");
-                }
-            } while (!clientFound);
+            } catch (EntityNotFoundException e) {
+                System.err.println(e.getMessage());
+                System.out.println("A trip must have a client associated try again.");
+            }
 
             int choice = -1;
 
@@ -1082,6 +1082,16 @@ public class SmartTravelService {
         trips = new Trip[0];
         accommodations = new Accommodation[0];
         transportations = new Transportation[0];
+    }
+
+    public static void findClientById(String clientId) throws EntityNotFoundException {
+        for (Client client : clients) {
+            if (client.getClientId().equalsIgnoreCase(clientId)) {
+                System.out.println(client);
+                return;
+            }
+        }
+        throw new EntityNotFoundException("Client not found");
     }
 
     public static Client[] getClients() {

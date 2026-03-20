@@ -34,7 +34,7 @@ public abstract class  Transportation {
         this.companyName = "Unknown";
         this.departureCity = "Unknown";
         this.arrivalCity = "Unknown";
-        this.price = 0.0;
+        setPrice(0.0);
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class  Transportation {
         this.companyName = other.companyName;
         this.departureCity = other.departureCity;
         this.arrivalCity = other.arrivalCity;
-        this.price = other.price;
+        setPrice(other.price);
     }
 
     /**
@@ -85,7 +85,7 @@ public abstract class  Transportation {
         this.companyName = companyName;
         this.departureCity = departureCity;
         this.arrivalCity = arrivalCity;
-        this.price = price;
+        setPrice(price);
     }
 
     // Getters and Setters
@@ -126,7 +126,12 @@ public abstract class  Transportation {
         return price;
     }
 
-    public void setPrice(double price) {this.price = price;}
+    public void setPrice(double price) throws InvalidTransportDataException {
+        if (price < 0) {
+            throw new InvalidTransportDataException("Price cannot be negative.");
+        }
+        this.price = price;
+    }
 
 
     /**

@@ -20,7 +20,7 @@ public class Hotel extends Accommodation {
      */
     public Hotel() throws  InvalidAccommodationDataException {
         super();
-        this.starRating = 1;
+        setStarRating(1);
     }
 
     /**
@@ -29,7 +29,8 @@ public class Hotel extends Accommodation {
      */
     public Hotel(String name, String location, double pricePerNight, int starRating) throws InvalidAccommodationDataException {
         super(name, location, pricePerNight);
-        this.starRating = starRating;
+
+        setStarRating(starRating);
     }
 
     /**
@@ -38,7 +39,8 @@ public class Hotel extends Accommodation {
      */
     public Hotel(String accommodationId, String name, String location, double pricePerNight, int stars) throws InvalidAccommodationDataException {
         super(accommodationId, name, location, pricePerNight);
-        this.starRating = stars;
+
+        setStarRating(stars);
     }
 
     /**
@@ -47,7 +49,8 @@ public class Hotel extends Accommodation {
      */
     public Hotel(Hotel other) throws InvalidAccommodationDataException {
         super(other);
-        this.starRating = other.getStarRating();
+
+        setStarRating(other.starRating);
     }
 
     public int getStarRating() {
@@ -55,7 +58,6 @@ public class Hotel extends Accommodation {
     }
 
     public void setStarRating(int starRating) throws InvalidAccommodationDataException{
-        // Rule: Stars 1-5
         if (starRating < 1 || starRating > 5) {
             throw new InvalidAccommodationDataException("Star rating must be between 1 and 5.");
         }
@@ -76,7 +78,6 @@ public class Hotel extends Accommodation {
      * Total cost = price per night * number of days.
      */
     public double calculateCost(int numberOfDays) throws InvalidAccommodationDataException {
-        // Rule: Number of nights >= 1 [cite: 50]
         if (numberOfDays < 1) {
             throw new InvalidAccommodationDataException("Number of nights must be at least 1.");
         }

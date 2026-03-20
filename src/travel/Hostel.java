@@ -61,11 +61,10 @@ public class Hostel extends Accommodation {
 
     @Override
     public void setPricePerNight(double pricePerNight) throws InvalidAccommodationDataException {
-        super.setPricePerNight(pricePerNight); // Enforces the > $0 rule from parent [cite: 49]
+        super.setPricePerNight(pricePerNight);
 
-        // Rule: Hostel < $150/night [cite: 52]
         if (pricePerNight >= 150.0) {
-            throw new InvalidAccommodationDataException("Hostel price must be strictly less than $150 per night.");
+            throw new InvalidAccommodationDataException("Hostel price must be less than $150 per night.");
         }
     }
 
@@ -102,7 +101,6 @@ public class Hostel extends Accommodation {
 
     @Override
     public double calculateCost(int numberOfDays) throws InvalidAccommodationDataException {
-        // Rule: Number of nights >= 1 [cite: 50]
         if (numberOfDays < 1) {
             throw new InvalidAccommodationDataException("Number of nights must be at least 1");
         }

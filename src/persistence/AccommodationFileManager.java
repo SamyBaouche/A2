@@ -102,7 +102,7 @@ public class AccommodationFileManager {
                 }
 
                 try {
-                    Accommodation newAccommodation = null;
+                    Accommodation newAccommodation;
 
                     if (type.equals("HOTEL")) {
                         int stars = Integer.parseInt(parts[5].trim());

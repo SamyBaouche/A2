@@ -65,11 +65,14 @@ public class Flight extends Transportation {
     }
 
     public void setLuggageAllowance(double luggageAllowance) throws InvalidTransportDataException {
-        // Rule: Luggage allowance >= 0kg
         if (luggageAllowance < 0) {
             throw new InvalidTransportDataException("Luggage allowance cannot be negative.");
         }
         this.luggageAllowance = luggageAllowance;
+    }
+
+    public double getBasePrice() {
+        return BASE_FLIGHT_PRICE;
     }
 
     /**

@@ -106,7 +106,7 @@ public class TransportFileManager {
                         newTransport = new Flight(id, company, origin, destination, price, luggage);
                     } else if (type.equals("TRAIN")) {
                         String trainType = parts[6].trim();
-                        newTransport = new Train(id, company, origin, destination, price, trainType);
+                        newTransport = new Train(id, company, origin, destination, price, trainType, "Economy");
                     } else if (type.equals("BUS")) {
                         int stops = Integer.parseInt(parts[6].trim());
                         newTransport = new Bus(id, company, origin, destination, price, stops);

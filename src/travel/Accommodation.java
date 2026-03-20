@@ -85,7 +85,6 @@ public abstract class Accommodation {
     }
 
     public void setPricePerNight(double pricePerNight) throws InvalidAccommodationDataException {
-        // Rule: Price/night > $0
         if (pricePerNight <= 0) {
             throw new InvalidAccommodationDataException("Price per night must be greater than $0.");
         }

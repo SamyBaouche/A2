@@ -1,10 +1,7 @@
 package driver;
 
 import client.Client;
-import exceptions.InvalidAccommodationDataException;
-import exceptions.InvalidClientDataException;
-import exceptions.InvalidTransportDataException;
-import exceptions.InvalidTripDataException;
+import exceptions.*;
 import persistence.ErrorLogger;
 import travel.*;
 
@@ -325,9 +322,22 @@ public class SmartTravelDriver {
                 "- 2 Objects of each Accomodation Type");
 
         //3 Clients
-        Client client1 = new Client("Jacob", "Delaire", "jacob.delaire@gmail.com");
-        Client client2 = new Client("Nathan", "Blo", "nathanblogmailcom"); //Exception example for the email
-        Client client3 = new Client("Mohammed", "Baouche", "mohammed.baouche@gmail.com");
+        Client client1 = null;
+        Client client2 = null;
+        Client client3 = null;
+
+        try {
+            client1 = new Client("Jacob", "Delaire", "jacob.delaire@gmail.com");
+            client2 = new Client("Nathan", "Blo", "nathan.blo@gmailcom");
+            client3 = new Client("Mohammed", "Baouche", "mohammed.baouche@gmail.com");
+        } catch (InvalidClientDataException | DuplicateEmailException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        //Clients Array predefined
+        SmartTravelService.addClientPredefined(client1);
+        SmartTravelService.addClientPredefined(client2);
+        SmartTravelService.addClientPredefined(client3);
 
         //2 Flights
         Flight flight1 = new Flight("Air Transat", "Montreal", "Fort Laudertale", 22);
@@ -341,32 +351,6 @@ public class SmartTravelDriver {
         Train train1 = new Train("Trans-Canada", "Montreal", "Vancouver", "TGV", "First Class");
         Train train2 = new Train("Trans-Canada", "Montreal", "Vancouver", "TGV", "First Class");
 
-        //2 Hotels
-        Hotel hotel1 = new Hotel("Marriott", "Barcelona", 100, 4);
-        Hotel hotel2 = new Hotel("Hilton", "Miami", 65, 3);
-
-        //2 Hostels
-        Hostel hostel1 = new Hostel("SleepInPeace", "Vancouver", 90, 3);
-        Hostel hostel2 = new Hostel("SleepInPeace", "Vancouver", 90, 3);
-
-        //3 Trips
-        Trip trip1 = new Trip("Vancouver", 14, 600, client1, hostel1, train1);
-        Trip trip2 = new Trip("Miami", 10, 400, client2, hotel2, bus1);
-        Trip trip3 = new Trip("Barcelona", 21, 900, client3, hotel1, flight2);
-
-        //Arrays for objects
-
-        //Clients Array predefined
-        SmartTravelService.addClientPredefined(client1);
-        SmartTravelService.addClientPredefined(client2);
-        SmartTravelService.addClientPredefined(client3);
-
-
-        //Trips Array predefined
-        SmartTravelService.addTripPredefined(trip1);
-        SmartTravelService.addTripPredefined(trip2);
-        SmartTravelService.addTripPredefined(trip3);
-
         //Transportation Array predefined
         SmartTravelService.addTransportationPredefined(flight1);
         SmartTravelService.addTransportationPredefined(flight2);
@@ -375,11 +359,29 @@ public class SmartTravelDriver {
         SmartTravelService.addTransportationPredefined(train1);
         SmartTravelService.addTransportationPredefined(train2);
 
-        //Accomodation Array predefined
+        //2 Hotels
+        Hotel hotel1 = new Hotel("Marriott", "Barcelona", 100, 4);
+        Hotel hotel2 = new Hotel("Hilton", "Miami", 65, 3);
+
+        //2 Hostels
+        Hostel hostel1 = new Hostel("SleepInPeace", "Vancouver", 90, 3);
+        Hostel hostel2 = new Hostel("SleepInPeace", "Vancouver", 90, 3);
+
+        //Accommodation Array predefined
         SmartTravelService.addAccommodationPredefined(hotel1);
         SmartTravelService.addAccommodationPredefined(hotel2);
         SmartTravelService.addAccommodationPredefined(hostel1);
         SmartTravelService.addAccommodationPredefined(hostel2);
+
+        //3 Trips
+        Trip trip1 = new Trip("Vancouver", 14, 600, client3, hostel1, train1);
+        Trip trip2 = new Trip("Barcelona", 10, 400, client3, hotel2, bus1);
+        Trip trip3 = new Trip("Barcelona", 20, 900, client1, hotel1, flight2);
+
+        //Trips Array predefined
+        SmartTravelService.addTripPredefined(trip1);
+        SmartTravelService.addTripPredefined(trip2);
+        SmartTravelService.addTripPredefined(trip3);
 
         System.out.println("\n      2. Display all created objects\n");
 
@@ -450,26 +452,110 @@ public class SmartTravelDriver {
             System.out.println("    " + transportation);
         }
 
+        //Exceptions test
+        System.out.println("\n      7. Exceptions test\n");
+
+        System.out.println("-- Creating a client with an invalid First Name --");
+        try {
+            Client invalidName = new Client("jbqibubauibfuibwquicbauiBCUIBSADUIbcuiabCUIABUICBAUIUBUIbiuovipvuvpuvuvpivivipvipvipvivivivuvuiv", "Doe", "Doe@gmail.com");
+        } catch (InvalidClientDataException | DuplicateEmailException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
+        System.out.println("\n-- Try finding for a Client ID that doesn't exist --");
+        try {
+            // Attempting to find a Client ID that was never added to the Service array
+            SmartTravelService.findClientById("fake id");
+        } catch (EntityNotFoundException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
+        System.out.println("\n-- Creating a client with invalid email --");
+        try {
+            Client invalidEmailClient = new Client("J", "D", "jd.com");
+            SmartTravelService.addClientPredefined(invalidEmailClient);
+        } catch (InvalidClientDataException | DuplicateEmailException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
+        System.out.println("\n-- Creating a client with duplicate email --");
+        try {
+            Client dupeClient = new Client("Jacob", "Two", "jacob.delaire@gmail.com");
+            SmartTravelService.addClientPredefined(dupeClient);
+        } catch (DuplicateEmailException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
+        System.out.println("\n-- Creating a trip with negative price --");
+        try {
+            Trip invalidTrip = new Trip("Montreal", 5, -100, client1, hotel1, flight1);
+        } catch (InvalidTripDataException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
+        System.out.println("\n-- Creating a bus with zero stops --");
+        try {
+            Bus invalidBus = new Bus("Test-Bus", "Montreal", "Ottawa", 0);
+        } catch (InvalidTransportDataException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
+        System.out.println("\n-- Flight with negative baggage allowance --");
+        try {
+            Flight invalidFlight = new Flight("Air Canada", "Montreal", "New York", -5);
+        } catch (InvalidTransportDataException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
+        System.out.println("\n-- Creating a hostel that's too expensive --");
+        try {
+            Hostel invalidHostel = new Hostel("Test Hostel", "Paris", 200.00, 5);
+        } catch (InvalidAccommodationDataException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
+        System.out.println("\n-- Creating a hotel with zero stars --");
+        try {
+            Hotel invalidHotel = new Hotel("Test Hotel", "Paris", 50.00, 0);
+        } catch (InvalidAccommodationDataException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
+        System.out.println("\n-- Creating a hotel with negative pricePerNight --");
+        try {
+            Hotel invalidHotel2 = new Hotel("Test Hotel", "Paris", -50.00, 3);
+        } catch (InvalidAccommodationDataException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
+        System.out.println("\n-- Calculating cost of  a hotel with 0 days --");
+        try {
+            Hotel hotelTest = new Hotel("Test Hotel", "Paris", 50.00, 3);
+            hotelTest.calculateCost(0);
+        } catch (InvalidAccommodationDataException e) {
+            ErrorLogger.log("Error: " + e.getMessage());
+        }
+
         //Save All Data
-        System.out.println("\n      7. Saving all data to files\n");
+        System.out.println("\n      8. Saving all data to files\n");
         SmartTravelService.saveAllData();
 
         //Clear all data from memory for test
         SmartTravelService.clearAllData();
 
         //Display all data after clearing to confirm it's empty
-        System.out.println("\n      8. Displaying all data after clearing \n");
+        System.out.println("\n      9. Displaying all data after clearing \n");
         SmartTravelService.displayClients();
         SmartTravelService.listAllTrips();
         SmartTravelService.listTransportationOptions();
         SmartTravelService.listAccommodationByType();
 
         //Load All Data
-        System.out.println("\n      9. Loading all data from files\n");
+        System.out.println("\n      10. Loading all data from files\n");
         SmartTravelService.loadAllData();
 
         //Display all data after loading to confirm it's back
-        System.out.println("\n      10. Displaying all data after loading \n");
+        System.out.println("\n      11. Displaying all data after loading \n");
         System.out.println("Clients:");
         SmartTravelService.displayClients();
         System.out.println("\nTrips:");
@@ -480,7 +566,7 @@ public class SmartTravelDriver {
         SmartTravelService.listAccommodationByType();
 
         //Generate Dashboard
-        System.out.println("\n      11. Generating Dashboard\n");
+        System.out.println("\n      12. Generating Dashboard\n");
         try {
             DashboardGenerator.generateDashboard();
         } catch (IOException e) {

@@ -60,9 +60,11 @@ public class TripFileManager {
         pw.close();
     }
 
-    public static void loadTrips(Trip[] trips, String filePath, Client[] clients, Accommodation[] acc, Transportation[] trans) throws IOException {
+    public static Trip[] loadTrips(String filePath, Client[] clients, Accommodation[] acc, Transportation[] trans) throws IOException {
         Scanner inFile = null;
         boolean fileFound = true;
+
+        Trip[] trips = new Trip[0];
 
         try {
             inFile = new Scanner(new FileReader(filePath));
@@ -72,7 +74,6 @@ public class TripFileManager {
         }
 
         if(fileFound) {
-            trips = new Trip[0];
 
             while (inFile.hasNextLine()) {
                 String line = inFile.nextLine();
@@ -137,7 +138,6 @@ public class TripFileManager {
                 //Need to check if an accomodation is really needed
                 if (accommodation == null) {
                     ErrorLogger.log("Accomodation doesn't exist at line: " + line);
-                    continue;
                 }
 
                 for (int i = 0; i < trans.length; i++) {
@@ -150,6 +150,10 @@ public class TripFileManager {
                 //Need to check if a transportation is really needed
                 if (transportation == null) {
                     ErrorLogger.log("Transportation doesn't exist at line: " + line);
+                }
+
+                if (accommodation == null && transportation == null) {
+                    ErrorLogger.log("Trip " + tripId + " failed: No accommodation or transportation found.");
                     continue;
                 }
 
@@ -170,5 +174,7 @@ public class TripFileManager {
 
             inFile.close();
         }
+
+        return trips;
     }
 }

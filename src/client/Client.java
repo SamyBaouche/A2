@@ -1,5 +1,6 @@
 package client;
 
+import exceptions.DuplicateEmailException;
 import exceptions.InvalidClientDataException;
 
 import java.util.Objects;
@@ -44,7 +45,7 @@ public class Client {
      */
 
     public Client(String firstName,
-                  String lastName, String email) throws InvalidClientDataException {
+                  String lastName, String email) throws InvalidClientDataException, DuplicateEmailException {
 
         if (firstName.isEmpty()) {
             throw new InvalidClientDataException("Your first name must be non-empty");
@@ -60,6 +61,12 @@ public class Client {
 
         if (email == null || email.length() > 100 || email.contains(" ") || !email.contains("@") || !email.contains(".")) {
             throw new InvalidClientDataException("Invalid email format. Must contain @ and ., have no spaces, and be 100 characters or less.");
+        }
+
+        for (Client clients: SmartTravelService.getClients()) {
+        	if (clients.getEmail().equals(email)) {
+        		throw new DuplicateEmailException("This email is already associated with another client.");
+        	}
         }
 
         this.clientId = "C" + idCounter;
@@ -86,7 +93,7 @@ public class Client {
         this.totalSpent = other.totalSpent;
     }
 
-    public Client(String id, String firstName, String lastName, String email) throws InvalidClientDataException {
+    public Client(String id, String firstName, String lastName, String email) throws InvalidClientDataException, DuplicateEmailException {
 
         if (firstName.isEmpty()) {
             throw new InvalidClientDataException("Your first name must be non-empty");
@@ -102,6 +109,12 @@ public class Client {
 
         if (email == null || email.length() > 100 || email.contains(" ") || !email.contains("@") || !email.contains(".")) {
             throw new InvalidClientDataException("Invalid email format. Must contain @ and ., have no spaces, and be 100 characters or less.");
+        }
+
+        for (Client clients: SmartTravelService.getClients()) {
+            if (clients.getEmail().equals(email)) {
+                throw new DuplicateEmailException("This email is already associated with another client.");
+            }
         }
 
         this.clientId = id;
@@ -144,11 +157,18 @@ public class Client {
         this.lastName = lastName;
     }
 
-    public void setEmail(String email) throws InvalidClientDataException {
+    public void setEmail(String email) throws InvalidClientDataException, DuplicateEmailException {
         // Rule: contains @ and ., no spaces, <= 100 chars
         if (email == null || email.length() > 100 || email.contains(" ") || !email.contains("@") || !email.contains(".")) {
             throw new InvalidClientDataException("Invalid email format. Must contain @ and ., have no spaces, and be 100 characters or less.");
         }
+
+        for (Client clients: SmartTravelService.getClients()) {
+            if (clients.getEmail().equals(email)) {
+                throw new DuplicateEmailException("This email is already associated with another client.");
+            }
+        }
+
         this.email = email;
     }
 

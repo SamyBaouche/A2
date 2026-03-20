@@ -1,0 +1,6 @@
+FLIGHT;TR3001;Air Transat;Montreal;Fort Laudertale;0.0;22.0
+FLIGHT;TR3002;Air Canada;Montreal;Barcelona;0.0;22.0
+BUS;TR3003;Chartrand;Fort Laudertale;Miami;0.0;30
+BUS;TR3004;Irizar;Barcelona;Marbella;0.0;12
+TRAIN;TR3005;Trans-Canada;Montreal;Vancouver;0.0;TGV
+TRAIN;TR3006;Trans-Canada;Montreal;Vancouver;0.0;TGV

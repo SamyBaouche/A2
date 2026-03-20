@@ -69,7 +69,6 @@ public class Bus extends Transportation {
     }
 
     public void setNumberOfStops(int numberOfStops) throws InvalidTransportDataException {
-        // Business rule: Bus requires >= 1 stop
         if (numberOfStops < 1) {
             throw new InvalidTransportDataException("A Bus requires at least 1 stop.");
         }

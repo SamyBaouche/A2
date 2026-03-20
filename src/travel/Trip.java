@@ -3,6 +3,7 @@ package travel;
 import client.Client;
 import exceptions.InvalidAccommodationDataException;
 import exceptions.InvalidTripDataException;
+import service.SmartTravelService;
 
 /**
  * The Trip class represents a travel booking.
@@ -38,6 +39,7 @@ public class Trip {
         if (accommodation == null && transportation == null) {
             throw new InvalidTripDataException("A trip must have at least an accommodation or a transportation.");
         }
+
         this.accommodation = accommodation;
         this.transportation = transportation;
     }
@@ -49,7 +51,7 @@ public class Trip {
     public Trip() throws InvalidTripDataException {
         this.tripID = "T" + tripIdCounter++;
         this.destination = "Unknown";
-        setBasePrice(100.0); // Rule: >= $100.00
+        setBasePrice(0);
         setDurationInDays(1); // Rule: 1-20 days
     }
 
@@ -186,25 +188,33 @@ public class Trip {
     public void setDurationInDays(int durationDays) throws InvalidTripDataException {
         // Rule: 1-20 days
         if (durationDays < 1 || durationDays > 20) {
-            throw new InvalidTripDataException("Trip duration must be between 1 and 20 days.");
+            throw new InvalidTripDataException("Trip duration must be between 1 and 60 days.");
         }
         this.durationInDays = durationDays;
     }
 
     public void setBasePrice(double basePrice) throws InvalidTripDataException {
-        // Rule: >= $100.00
-        if (basePrice < 100.00) {
-            throw new InvalidTripDataException("Base price must be at least $100.00.");
+        if (basePrice < 0 || basePrice < 100) {
+            throw new InvalidTripDataException("Base price must be positive and over $100.");
         }
+
         this.basePrice = basePrice;
     }
 
     public void setClientAssociated(Client clientAssociated) throws InvalidTripDataException {
-        // Rule: ClientID is mandatory
+
         if (clientAssociated == null) {
             throw new InvalidTripDataException("A trip must be associated with a valid client.");
         }
-        this.clientAssociated = clientAssociated;
+
+        for (Client client: SmartTravelService.getClients()) {
+            if (client.getClientId().equals(clientAssociated.getClientId())) {
+                this.clientAssociated = client;
+                return;
+            }
+        }
+
+        throw new InvalidTripDataException("Client not found");
     }
 
     public void setTransportation(Transportation transportation) throws InvalidTripDataException {

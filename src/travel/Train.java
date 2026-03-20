@@ -48,9 +48,10 @@ public class Train extends Transportation {
      * Parameterized constructor for loading data from files (CSV) WITHOUT seat class.
      * Matches the CSV format: TRAIN; TR3002;Shinkansen;Tokyo; Kyoto;250.00;HighSpeed
      */
-    public Train(String transportId, String companyName, String departureCity, String arrivalCity, double price, String trainType) throws InvalidTransportDataException {
+    public Train(String transportId, String companyName, String departureCity, String arrivalCity, double price, String trainType, String seatClass) throws InvalidTransportDataException {
         super(transportId, companyName, departureCity, arrivalCity, price);
         this.trainType = trainType;
+        this.seatClass = seatClass;
     }
 
     /**
@@ -62,6 +63,7 @@ public class Train extends Transportation {
 
         super(other);
         this.trainType = other.trainType;
+        this.seatClass = other.seatClass;
     }
 
     //Getters and Setters
@@ -72,6 +74,14 @@ public class Train extends Transportation {
 
     public void setTrainType(String trainType) {
         this.trainType = trainType;
+    }
+
+    public String getSeatClass() {
+        return seatClass;
+    }
+
+    public void setSeatClass(String seatClass) {
+        this.seatClass = seatClass;
     }
 
 
@@ -107,8 +117,7 @@ public class Train extends Transportation {
     /**
      * Calculates the cost of the train ticket based on seat class.
      * - Economy → ECONOMY_PRICE
-     * - Business → FIRST_CLASS_PRICE
-     *
+     * - Business → BUSINESS_PRICE
      * @param numberOfDays not used (required by abstract method)
      * @return calculated ticket price
      */
