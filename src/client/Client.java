@@ -54,6 +54,10 @@ public class Client {
             throw new InvalidClientDataException("Your last name can't be longer than 50 caracters");
         }
 
+        if (email == null || email.length() > 100 || email.contains(" ") || !email.contains("@") || !email.contains(".")) {
+            throw new InvalidClientDataException("Invalid email format. Must contain @ and ., have no spaces, and be 100 characters or less.");
+        }
+
         this.clientId = "C" + idCounter;
         idCounter++;
 

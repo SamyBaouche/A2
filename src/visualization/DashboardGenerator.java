@@ -133,14 +133,14 @@ public class DashboardGenerator {
         
         for (int i = 0; i < clients.length; i++) {
             Client client = clients[i];
-            double spent = client.getTotalSpent();
+            //double spent = client.getTotalSpent();
             out.println("                    <tr>");
             out.println("                        <td><strong>" + client.getClientId() + "</strong></td>");
             out.println("                        <td>" + client.getFirstName() + " " + client.getLastName() + "</td>");
             out.println("                        <td>" + client.getEmail() + "</td>");
-            out.println("                        <td style='font-weight: bold; color: " + 
-                    								(spent > 3000 ? "#d32f2f" : "#388e3c") + ";'>" + 
-                    										String.format("%,.2f", spent) + "</td>");
+            //out.println("                        <td style='font-weight: bold; color: " +
+                    								//(spent > 3000 ? "#d32f2f" : "#388e3c") + ";'>" +
+                    										//String.format("%,.2f", spent) + "</td>");
             out.println("                    </tr>");
         }
         out.println("                </tbody>");
@@ -245,7 +245,7 @@ public class DashboardGenerator {
         // Stat 1: Average Cost
         out.println("                <div class='stat-item'>");
         out.println("                    <span class='stat-label'>Avg Trip Cost</span>");
-        out.println("                    <span class='stat-value'>$" + String.format("%,.0f", avgCost) + "</span>");
+        //out.println("                    <span class='stat-value'>$" + String.format("%,.0f", avgCost) + "</span>");
         out.println("                </div>");
         
         // Stat 2: Average Duration 
@@ -263,7 +263,7 @@ public class DashboardGenerator {
         // Stat 4: Most Visited
         out.println("                <div class='stat-item'>");
         out.println("                    <span class='stat-label'>Most Visited</span>");
-        out.println("                    <span class='stat-value'>" + mostVisited + "<br><small>(" + visitCount + " trips)</small></span>");
+        //out.println("                    <span class='stat-value'>" + mostVisited + "<br><small>(" + visitCount + " trips)</small></span>");
         out.println("                </div>");
         
         out.println("            </div>");
@@ -301,6 +301,7 @@ public class DashboardGenerator {
     private static String findMostVisitedDestination(SmartTravelService service) {
         
 		//ADD CODE
+        return "";
     }
 
     /**
@@ -309,6 +310,7 @@ public class DashboardGenerator {
     private static int countDestinationVisits(SmartTravelService service, String destination) {
         
 		//ADD CODE
+        return 0;
     }
 
     

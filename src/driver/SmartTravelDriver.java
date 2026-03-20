@@ -33,48 +33,6 @@ public class SmartTravelDriver {
 
     static Scanner sc = new Scanner(System.in);
 
-    static Client[] clients;
-
-    static {
-        try {
-            clients = new Client[] {
-                    new Client("momo", "elbn", "m.elbn@gmail.com")
-            };
-        } catch (InvalidClientDataException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // Array size 0
-    static Transportation[] transportations;
-
-    static {
-        try {
-            transportations = new Transportation[] {
-                    new Flight("Air Canada", "Laval", "Vancouver", 22),
-                    new Train("Train", "Laval", "Mtl", "Bullet", "Economy")
-            };
-        } catch (InvalidTransportDataException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // Array with 1 Hotel and 1 Hostel
-    static Accommodation[] accommodations;
-
-    static {
-        try {
-            accommodations = new Accommodation[] {
-                    new Hotel("Marriott", "Barcelona", 100, 4),
-                    new Hostel("SleepInPeace", "Vancouver", 90, 2)
-            };
-        } catch (InvalidAccommodationDataException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static Trip[] trips = new Trip[0];
-
     /**
      * SmartTravelDriver
      *
@@ -87,12 +45,16 @@ public class SmartTravelDriver {
         System.out.println("Welcome to SmartTravelPlanner by: \n" +
                 "   Mohammed El Ouaabani and Samy Baouche \n");
 
-        System.out.print("What would you like to access: \n" +
-                "   1- Menu-driven interface \n" +
-                "   2- Predefined testing scenario \n" +
-                "Enter your choice > ");
+        int optionChoice;
 
-        int optionChoice = SmartTravelService.valideIntegerInput();
+        do {
+            System.out.print("What would you like to access: \n" +
+                    "   1- Menu-driven interface \n" +
+                    "   2- Predefined testing scenario \n" +
+                    "Enter your choice > ");
+
+            optionChoice = SmartTravelService.valideIntegerInput();
+        } while (optionChoice < 1 || optionChoice > 2);
 
         switch (optionChoice) {
 
@@ -106,48 +68,44 @@ public class SmartTravelDriver {
 
                     switch (choiceMenu) {
                         case 1 -> {
-                            System.out.println();
                             clientManagement();
                         }
 
                         case 2 -> {
-                            System.out.println();
                             tripManagement();
                         }
 
                         case 3 -> {
-                            System.out.println();
                             transportationManagement();
                         }
                         case 4 -> {
-                            System.out.println();
                             accommodationManagement();
                         }
 
                         case 5 -> {
-                            System.out.println();
                             SmartTravelService.additionalOperations();
                         }
+
                         case 6 -> {
-                            System.out.println();
                             SmartTravelService.listAllTrips();
                         }
+
                         case 7 -> {
-                            System.out.println();
-                            SmartTravelService.loadAllData("output/data/");
+                            SmartTravelService.loadAllData();
                         }
+
                         case 8 -> {
-                            System.out.println();
-                            SmartTravelService.saveAllData("output/data/");
+                            SmartTravelService.saveAllData();
                         }
+
                         case 9 -> {
-                            System.out.println();
                             predefinedScenario();
                         }
+
                         case 10 -> {
-                            System.out.println();
                             //visualization.DashboardGenerator.generateDashboard();
                         }
+
                         case 0 -> {
                             System.out.println("Thank you for using our Smart Travel Planner");
                         }
@@ -214,7 +172,6 @@ public class SmartTravelDriver {
             System.out.print("> ");
 
             choice = SmartTravelService.valideIntegerInput();
-            sc.nextLine();
         } while (choice < 0 || choice > 4);
 
         switch (choice) {

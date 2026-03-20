@@ -21,7 +21,7 @@ public class ClientFileManager {
         File file = new File(filePath);
 
         // 2. Make sure the folders exist (like output/data/) so it doesn't crash
-        file.getParentFile().mkdirs();
+        //file.getParentFile().mkdirs();
 
         // 3. Open the file for writing
         FileWriter fw = new FileWriter(file);

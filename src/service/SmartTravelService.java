@@ -21,12 +21,12 @@ public class SmartTravelService {
     private static Accommodation[] accommodations = new Accommodation[0];
     private static Transportation[] transportations = new Transportation[0];
 
-    public static void loadAllData(String directory){
+    public static void loadAllData(){
         try {
-            clients = ClientFileManager.loadClients("clients.csv");
-            accommodations = AccommodationFileManager.loadAccommodations("accommodations.csv");
-            transportations = TransportFileManager.loadTransportations("transports.csv");
-            TripFileManager.loadTrips(trips,"trips.csv",clients,accommodations,transportations);
+            clients = ClientFileManager.loadClients("output/data/clients.csv");
+            accommodations = AccommodationFileManager.loadAccommodations("output/data/accommodations.csv");
+            transportations = TransportFileManager.loadTransportations("output/data/transports.csv");
+            TripFileManager.loadTrips(trips,"output/data/trips.csv",clients,accommodations,transportations);
 
             System.out.println("All data loaded !");
         } catch (IOException e) {
@@ -34,12 +34,12 @@ public class SmartTravelService {
         }
     }
 
-    public static void saveAllData(String directory){
+    public static void saveAllData(){
         try {
-            ClientFileManager.saveClients(clients,"clients.csv");
-            AccommodationFileManager.saveAccommodations(accommodations,"accommodations.csv");
-            TransportFileManager.saveTransportations(transportations,"transports.csv");
-            TripFileManager.saveTrips(trips,"trips.csv");
+            ClientFileManager.saveClients(clients,"output/data/clients.csv");
+            AccommodationFileManager.saveAccommodations(accommodations,"output/data/accommodations.csv");
+            TransportFileManager.saveTransportations(transportations,"output/data/transports.csv");
+            TripFileManager.saveTrips(trips,"output/data/trips.csv");
 
             System.out.println("All data saved !");
 
@@ -1046,9 +1046,11 @@ public class SmartTravelService {
     public static int valideIntegerInput() {
         while (true) {
             try {
-                return sc.nextInt();
+                String s = sc.nextLine();
+                return Integer.parseInt(s);
             } catch (InputMismatchException e) {
                 System.out.println("Please type a valid number");
+                sc.nextLine();
             }
         }
     }
@@ -1059,6 +1061,7 @@ public class SmartTravelService {
                 return sc.nextDouble();
             } catch (InputMismatchException e) {
                 System.out.println("Please type a valid number");
+                sc.nextLine();
             }
         }
     }

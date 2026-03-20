@@ -16,7 +16,7 @@ public class TransportFileManager {
         File file = new File(filePath);
 
         if (file.getParentFile() != null) {
-            file.getParentFile().mkdirs();
+            //file.getParentFile().mkdirs();
         }
 
         FileWriter fw = new FileWriter(file);

@@ -18,7 +18,7 @@ public class AccommodationFileManager {
 
         // 1. Create file and make sure the folder exists
         File file = new File(filePath);
-        file.getParentFile().mkdirs();
+        //file.getParentFile().mkdirs();
 
         // 2. Open the file for writing
         FileWriter fw = new FileWriter(file);

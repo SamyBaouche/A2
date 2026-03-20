@@ -15,3 +15,5 @@ Count:  9
  8: Invalid Trip Exception: Record number 13 in trips file. Trip Error: Invalid tripId: X6008
  9: Invalid Trip Exception: Record number 14 in trips file. Entity not found: ID = Accommodation not found: A4104
 ================================================================================================================================
+Invalid line format (skipping): C1008;Bob Brown;bob.brown@australia.com
+Duplicate email error: Email already exists: miguel.gomez@spain.com in line: C1011;Mig;Gomez;miguel.gomez@spain.com

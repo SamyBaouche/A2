@@ -18,7 +18,7 @@ public class TripFileManager {
 
         // 1. Create file and folders
         File file = new File(filePath);
-        file.getParentFile().mkdirs();
+        //file.getParentFile().mkdirs();
 
         // 2. Open file for writing
         FileWriter fw = new FileWriter(file);
