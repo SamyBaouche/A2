@@ -14,7 +14,7 @@ public class AccommodationFileManager {
     /**
      * Saves the accommodations array to a CSV file.
      */
-    public static void saveAccommodations(Accommodation[] accoms, int accomCount, String filePath) throws IOException {
+    public static void saveAccommodations(Accommodation[] accoms, String filePath) throws IOException {
 
         // 1. Create file and make sure the folder exists
         File file = new File(filePath);
@@ -25,7 +25,7 @@ public class AccommodationFileManager {
         PrintWriter pw = new PrintWriter(fw);
 
         // 3. Loop through exactly the valid number of accommodations
-        for (int i = 0; i < accomCount; i++) {
+        for (int i = 0; i < accoms.length; i++) {
             Accommodation accommodation = accoms[i];
 
             // 4. Check if it is a Hotel or a Hostel so we can format it correctly
@@ -36,7 +36,7 @@ public class AccommodationFileManager {
                         hotel.getName() + ";" +
                         hotel.getLocation() + ";" +
                         hotel.getPricePerNight() + ";" +
-                        hotel.getStars();
+                        hotel.getStarRating();
                 pw.println(line);
             }
             else if (accommodation instanceof Hostel) {
@@ -55,22 +55,24 @@ public class AccommodationFileManager {
         pw.close();
     }
 
-    public static int loadAccommodations(Accommodation[] accoms, String filePath) throws IOException {
+    public static Accommodation[] loadAccommodations(String filePath) throws IOException {
 
-        int count = 0;
+        Accommodation[] accoms = new Accommodation[0];
         File file = new File(filePath);
 
         if (!file.exists()) {
             ErrorLogger.log("Accommodations file does not exist: " + filePath);
-            return 0;
+            return new Accommodation[0];
         }
 
         Scanner sc = null;
 
+
+
         try {
             sc = new Scanner(file);
 
-            while (sc.hasNextLine() && count < accoms.length) {
+            while (sc.hasNextLine()) {
                 String line = sc.nextLine();
 
                 if (line.isEmpty()) {
@@ -106,15 +108,26 @@ public class AccommodationFileManager {
                         int stars = Integer.parseInt(parts[5].trim());
                         newAccommodation = new Hotel(accommodationId, name, location, pricePerNight, stars);
                     } else if (type.equals("HOSTEL")) {
-                        int capacity = Integer.parseInt(parts[5].trim());
-                        newAccommodation = new Hostel(accommodationId, name, location, pricePerNight,1, capacity);
+                        int sharedBeds = Integer.parseInt(parts[5].trim());
+                        newAccommodation = new Hostel(accommodationId, name, location, pricePerNight, sharedBeds);
                     } else {
                         ErrorLogger.log("Unknown accommodation type '" + type + "' in line: " + line);
                         continue;
                     }
 
-                    accoms[count] = newAccommodation;
-                    count++;
+                    if (accoms.length == 0) {
+                        Accommodation[] temp = new Accommodation[1];
+                        temp[0] = newAccommodation;
+                        accoms = temp;
+                    } else {
+                        Accommodation[] temp = new Accommodation[accoms.length + 1];
+                        for (int i = 0; i < accoms.length; i++) {
+                            temp[i] = accoms[i];
+                        }
+
+                        temp[temp.length - 1] = newAccommodation;
+                        accoms = temp;
+                    }
                 } catch (InvalidAccommodationDataException e) { //
                     ErrorLogger.log("Validation error: " + e.getMessage() + " in line: " + line); //
                 } catch (NumberFormatException e) {
@@ -126,7 +139,7 @@ public class AccommodationFileManager {
                 sc.close();
             }
         }
-        return count;
+        return accoms;
     }
 
 

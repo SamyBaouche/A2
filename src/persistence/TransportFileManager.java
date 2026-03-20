@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class TransportFileManager {
 
-    public static void saveTransportations(Transportation[] transports, int count, String filePath) throws IOException {
+    public static void saveTransportations(Transportation[] transports, String filePath) throws IOException {
 
         File file = new File(filePath);
 
@@ -22,7 +22,7 @@ public class TransportFileManager {
         FileWriter fw = new FileWriter(file);
         PrintWriter pw = new PrintWriter(fw);
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < transports.length; i++) {
             Transportation transport = transports[i];
 
             if (transport != null) {
@@ -53,22 +53,23 @@ public class TransportFileManager {
         pw.close();
     }
 
-    public static int loadTransportations(Transportation[] transports, String filePath) throws IOException {
+    public static Transportation[] loadTransportations(String filePath) throws IOException {
 
-
-        int count = 0;
         File file = new File(filePath);
 
         if (!file.exists()) {
             ErrorLogger.log(filePath + " does not exist");
-            return 0;
+            return new Transportation[0];
         }
 
         Scanner sc = null;
 
+        Transportation[] transports = new Transportation[0];
+
         try {
             sc = new Scanner(file);
-            while (sc.hasNextLine() && count < transports.length) {
+
+            while (sc.hasNextLine()) {
                 String line = sc.nextLine();
 
                 if (line.isEmpty()) {
@@ -98,9 +99,8 @@ public class TransportFileManager {
                 }
 
                 try {
-                    Transportation newTransport = null;
+                    Transportation newTransport;
 
-                    // Polymorphic loading based on the type prefix [cite: 89]
                     if (type.equals("FLIGHT")) {
                         double luggage = Double.parseDouble(parts[6].trim());
                         newTransport = new Flight(id, company, origin, destination, price, luggage);
@@ -115,8 +115,19 @@ public class TransportFileManager {
                         continue;
                     }
 
-                    transports[count] = newTransport;
-                    count++;
+                    Transportation[] temp = new Transportation[transports.length + 1];
+
+                    if (transports.length > 0) {
+                        for (int i = 0; i < transports.length; i++) {
+                            temp[i] = transports[i];
+                        }
+
+                        temp[temp.length - 1] = newTransport;
+                        transports = temp;
+                    } else {
+                        temp[temp.length - 1] = newTransport;
+                        transports = temp;
+                    }
 
                 } catch (InvalidTransportDataException e) {
                     ErrorLogger.log("Validation error: " + e.getMessage() + " in line: " + line);
@@ -130,6 +141,6 @@ public class TransportFileManager {
             }
         }
 
-        return count;
+        return transports;
     }
 }

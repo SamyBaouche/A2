@@ -15,9 +15,9 @@ public class Hostel extends Accommodation {
 
     /**
      * Default constructor.
-     * Calls the parent constructor and initializes sharedBeds to 0.
+     * Calls the parent constructor and initializes sharedBeds to 1.
      */
-    public Hostel(String sleepInPeace, String vancouver, int i, int pricePerNight, int sharedBeds) throws  InvalidAccommodationDataException {
+    public Hostel() throws  InvalidAccommodationDataException {
         super();
         this.sharedBeds = 1;
     }

@@ -15,7 +15,7 @@ public class ClientFileManager {
     /**
      * Saves the clients array to a CSV file exactly as required.
      */
-    public static void saveClients(Client[] clients, int clientCount, String filePath) throws IOException {
+    public static void saveClients(Client[] clients, String filePath) throws IOException {
 
         // 1. Create a File object
         File file = new File(filePath);
@@ -28,10 +28,7 @@ public class ClientFileManager {
         PrintWriter pw = new PrintWriter(fw);
 
         // 4. Loop exactly from 0 to clientCount
-        for (int i = 0; i < clientCount; i++) {
-
-            // Get the current client
-            Client c = clients[i];
+        for (Client c : clients) {
 
             // 5. Create a string with the exact CSV format using semicolons
             String line = c.getClientId() + ";" +
@@ -47,21 +44,21 @@ public class ClientFileManager {
         pw.close();
     }
 
-    public static int loadClients(Client[] clients, String filePath) throws IOException {
+    public static Client[] loadClients(String filePath) throws IOException {
 
-        int clientCount = 0;
+        Client[] clients = new Client[0];
         File file = new File(filePath);
 
         if (!file.exists()) {
             ErrorLogger.log("Client file does not exist: " + filePath);
-            return 0;
+            return new Client[0];
         }
 
         Scanner sc = null;
         try {
             sc = new Scanner(file);
 
-            while (sc.hasNextLine() && clientCount < clients.length) {
+            while (sc.hasNextLine()) {
                 String line = sc.nextLine();
 
                 if (line.isEmpty()) {
@@ -81,17 +78,25 @@ public class ClientFileManager {
                 String email = parts[3].trim();
 
                 try {
-                    for (int i = 0; i < clientCount; i++) {
-                        if (clients[i] != null && clients[i].getEmail().equalsIgnoreCase(email)) {
-                            throw new DuplicateEmailException("Email already exists: " + email);
+                    if (clients.length != 0) {
+                        for (int i = 0; i < clients.length; i++) {
+                            if (clients[i] != null && clients[i].getEmail().equalsIgnoreCase(email)) {
+                                throw new DuplicateEmailException("Email already exists: " + email);
+                            }
                         }
                     }
 
                     Client newClient = new Client(id, firstName, lastName, email);
 
+                    Client[] temp = new Client[clients.length + 1];
 
-                    clients[clientCount] = newClient;
-                    clientCount++;
+                    for (int i = 0 ; i < clients.length; i++) {
+                        temp[i] = clients[i];
+                    }
+
+                    temp[temp.length - 1] = newClient;
+
+                    clients = temp;
 
                 } catch (DuplicateEmailException e) {
                     ErrorLogger.log("Duplicate email error: " + e.getMessage() + " in line: " + line);
@@ -105,7 +110,7 @@ public class ClientFileManager {
             }
         }
 
-        return clientCount;
+        return clients;
 
     }
 }

@@ -20,6 +20,8 @@ package visualization;
 
 import service.SmartTravelService;
 import client.Client;
+import travel.Accommodation;
+import travel.Transportation;
 import travel.Trip;
 
 import java.io.File;
@@ -51,7 +53,7 @@ public class DashboardGenerator {
         TripChartGenerator.generateDurationLineChart(service);
         
         // 2. Generate HTML dashboard
-        generateHTMLDashboard(service);
+        generateHTMLDashboard();
         
         // 3. Auto-open in browser
         openInBrowser();
@@ -70,11 +72,10 @@ public class DashboardGenerator {
      *   <li>Charts section (3 JFreeChart PNGs)</li>
      *   <li>Quick stats summary</li>
      * </ul>
-     * 
-     * @param service Service containing all data
+     *
      * @throws IOException if HTML write fails
      */
-    private static void generateHTMLDashboard(SmartTravelService service) throws IOException {
+    private static void generateHTMLDashboard() throws IOException {
         PrintWriter out = new PrintWriter("output/dashboard/dashboard.html");
         out.println("<!DOCTYPE html>");
         out.println("<html lang='en'>");
@@ -87,11 +88,11 @@ public class DashboardGenerator {
         out.println("</head>");
         out.println("<body>");
         out.println("    <div class='container'>");
-        writeSummary(service, out);
-        writeClientsTable(service, out);
-        writeTripsTable(service, out);
+        writeSummary(out);
+        writeClientsTable(out);
+        writeTripsTable(out);
         writeChartsSection(out);
-        writeStats(service, out);
+        writeStats(out);
         out.println("    </div>");
         out.println("</body>");
         out.println("</html>");
@@ -100,15 +101,14 @@ public class DashboardGenerator {
     
     /**
      * Writes dashboard header with dynamic stats.
-     * 
-     * @param service Service for client/trip counts
+     *
      * @param out HTML PrintWriter
      */
-    private static void writeSummary(SmartTravelService service, PrintWriter out) {
+    private static void writeSummary(PrintWriter out) {
         out.println("        <header>");
         out.println("            <h1>SmartTravel Dashboard</h1>");
         out.println("            <p>A2: File I/O + Exceptions | " + 
-                   service.getClientCount() + " Clients | " + service.getTripCount() + " Trips</p>");
+                   SmartTravelService.getClients().length + " Clients | " + SmartTravelService.getTrips().length + " Trips</p>");
         out.println("        </header>");
     }
     
@@ -117,21 +117,22 @@ public class DashboardGenerator {
      * 
      * <p>Columns: ID (bold), Full Name, Email</p>
      * <p>Hover effects + alternating row colors</p>
-     * 
-     * @param service Service containing Client array
+     *
      * @param out HTML PrintWriter
      */
-    private static void writeClientsTable(SmartTravelService service, PrintWriter out) {
+    private static void writeClientsTable(PrintWriter out) {
+        Client[] clients = SmartTravelService.getClients();
+
         out.println("        <section class='data-section'>");
-        out.println("            <h2> Clients (" + service.getClientCount() + ")</h2>");
+        out.println("            <h2> Clients (" + clients.length + ")</h2>");
         out.println("            <table>");
         out.println("                <thead>");
         out.println("                    <tr><th>ID</th><th>Name</th><th>Email</th><th>Total Spent ($)</th></tr>");
         out.println("                </thead>");
         out.println("                <tbody>");
         
-        for (int i = 0; i < service.getClientCount(); i++) {
-            Client client = service.getClient(i);
+        for (int i = 0; i < clients.length; i++) {
+            Client client = clients[i];
             double spent = client.getTotalSpent();
             out.println("                    <tr>");
             out.println("                        <td><strong>" + client.getClientId() + "</strong></td>");
@@ -151,27 +152,28 @@ public class DashboardGenerator {
      * Generates responsive Trips table sorted by ID.
      * 
      * <p>Columns: ID (bold), Client ID, Destination, Days, Price ($ formatted)</p>
-     * 
-     * @param service Service containing Trip array
+     *
      * @param out HTML PrintWriter
      */
-    private static void writeTripsTable(SmartTravelService service, PrintWriter out) {
+    private static void writeTripsTable(PrintWriter out) {
+        Trip[] trips = SmartTravelService.getTrips();
+
         out.println("        <section class='data-section'>");
-        out.println("            <h2> Trips (" + service.getTripCount() + ")</h2>");
+        out.println("            <h2> Trips (" + trips.length + ")</h2>");
         out.println("            <table>");
         out.println("                <thead>");
         out.println("                    <tr><th>ID</th><th>Client</th><th>Destination</th><th>Days</th><th>Price</th></tr>");
         out.println("                </thead>");
         out.println("                <tbody>");
         
-        for (int i = 0; i < service.getTripCount(); i++) {
-            Trip trip = service.getTrip(i);
+        for (int i = 0; i < trips.length; i++) {
+            Trip trip = trips[i];
             out.println("                    <tr>");
             out.println("                        <td><strong>" + trip.getTripId() + "</strong></td>");
-            out.println("                        <td>" + trip.getClientId() + "</td>");
+            out.println("                        <td>" + trip.getClientAssociated().getClientId() + "</td>");
             out.println("                        <td>" + trip.getDestination() + "</td>");
             out.println("                        <td>" + trip.getDurationInDays() + "</td>");
-            out.println("                        <td>$" + String.format("%.2f", service.calculateTripTotal(i)) + "</td>");
+            out.println("                        <td>$" + String.format("%.2f", trip.calculateTotalCost()) + "</td>");
             out.println("                    </tr>");
         }
         out.println("                </tbody>");
@@ -210,13 +212,14 @@ public class DashboardGenerator {
      * Calculates and displays key business metrics.
      * 
      * <p>Stats: Average Trip Cost, Total Revenue</p>
-     * 
-     * @param service Service containing Trip array
+     *
      * @param out HTML PrintWriter
      */
-    private static void writeStats(SmartTravelService service, PrintWriter out) {
+    private static void writeStats(PrintWriter out) {
+
+        Trip[] trips = SmartTravelService.getTrips();
         
-    	int tripCount = service.getTripCount();
+    	int tripCount = trips.length;
         if (tripCount == 0) {
             out.println("        <section class='stats-section'>");
             out.println("            <h2>No Trip Data</h2>");

@@ -14,7 +14,7 @@ public class TripFileManager {
      * Saves the trips array to a CSV file.
      * Format: TripID;ClientID;AccommodationID;TransportationID;Destination;DurationDays;BasePrice
      */
-    public static void saveTrips(Trip[] trips, int tripCount, String filePath) throws IOException {
+    public static void saveTrips(Trip[] trips, String filePath) throws IOException {
 
         // 1. Create file and folders
         File file = new File(filePath);
@@ -25,7 +25,7 @@ public class TripFileManager {
         PrintWriter pw = new PrintWriter(fw);
 
         // 3. Loop through exactly the valid number of trips
-        for (int i = 0; i < tripCount; i++) {
+        for (int i = 0; i < trips.length; i++) {
             Trip t = trips[i];
 
             // 4. Get the Client ID
@@ -60,7 +60,7 @@ public class TripFileManager {
         pw.close();
     }
 
-    public static int loadTrips(Trip[] trips, String filePath, Client[] clients, Accommodation[] acc, Transportation[] trans) throws IOException {
+    public static void loadTrips(Trip[] trips, String filePath, Client[] clients, Accommodation[] acc, Transportation[] trans) throws IOException {
         Scanner inFile = null;
         boolean fileFound = true;
 
@@ -72,8 +72,7 @@ public class TripFileManager {
         }
 
         if(fileFound) {
-
-            int compteur = 0;
+            trips = new Trip[0];
 
             while (inFile.hasNextLine()) {
                 String line = inFile.nextLine();
@@ -136,10 +135,10 @@ public class TripFileManager {
                 }
 
                 //Need to check if an accomodation is really needed
-                //if (accommodation == null) {
-                    //ErrorLogger.log("Accomodation doesn't exist at line: " + line);
-                   // continue;
-                //}
+                if (accommodation == null) {
+                    ErrorLogger.log("Accomodation doesn't exist at line: " + line);
+                    continue;
+                }
 
                 for (int i = 0; i < trans.length; i++) {
                     if (trans[i] != null && trans[i].getTransportId().equals(transId)) {
@@ -149,15 +148,19 @@ public class TripFileManager {
                 }
 
                 //Need to check if a transportation is really needed
-                //if (transportation == null) {
-                    //ErrorLogger.log("Transportation doesn't exist at line: " + line);
-                    //continue;
-                //}
+                if (transportation == null) {
+                    ErrorLogger.log("Transportation doesn't exist at line: " + line);
+                    continue;
+                }
 
                 try {
                     trip = new Trip(tripId, destination, duration, price, client, accommodation, transportation);
-                    trips[compteur] = trip;
-                    compteur++;
+                    Trip[] tempTrips = new Trip[trips.length + 1];
+                    for (int i = 0; i < trips.length; i++) {
+                        tempTrips[i] = trips[i];
+                    }
+                    tempTrips[tempTrips.length - 1] = trip;
+                    trips = tempTrips;
 
                     Trip.updateIdCounter(tripId);
                 } catch (InvalidTripDataException e) {

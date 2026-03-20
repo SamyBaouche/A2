@@ -16,22 +16,17 @@ public class SmartTravelService {
 
     static Scanner sc = new Scanner(System.in);
 
-    private static Client[] clients = new Client[100];
-    private static Trip[] trips = new Trip[200];
-    private static Accommodation[] accommodations = new Accommodation[50];
-    private static Transportation[] transportations = new Transportation[50];
-
-    private static int clientCount = 0;
-    private static int tripCount = 0;
-    private static int accommodationCount = 0;
-    private static int transportationCount = 0;
+    private static Client[] clients = new Client[0];
+    private static Trip[] trips = new Trip[0];
+    private static Accommodation[] accommodations = new Accommodation[0];
+    private static Transportation[] transportations = new Transportation[0];
 
     public static void loadAllData(String directory){
         try {
-            clientCount = ClientFileManager.loadClients(clients,"clients.csv");
-            accommodationCount = AccommodationFileManager.loadAccommodations(accommodations,"accommodations.csv");
-            transportationCount = TransportFileManager.loadTransportations(transportations, "transports.csv");
-            tripCount = TripFileManager.loadTrips(trips,"trips.csv",clients,accommodations,transportations);
+            clients = ClientFileManager.loadClients("clients.csv");
+            accommodations = AccommodationFileManager.loadAccommodations("accommodations.csv");
+            transportations = TransportFileManager.loadTransportations("transports.csv");
+            TripFileManager.loadTrips(trips,"trips.csv",clients,accommodations,transportations);
 
             System.out.println("All data loaded !");
         } catch (IOException e) {
@@ -41,10 +36,10 @@ public class SmartTravelService {
 
     public static void saveAllData(String directory){
         try {
-            ClientFileManager.saveClients(clients,clientCount,"clients.csv");
-            AccommodationFileManager.saveAccommodations(accommodations,accommodationCount,"accommodations.csv");
-            TransportFileManager.saveTransportations(transportations,transportationCount,"transports.csv");
-            TripFileManager.saveTrips(trips,tripCount,"trips.csv");
+            ClientFileManager.saveClients(clients,"clients.csv");
+            AccommodationFileManager.saveAccommodations(accommodations,"accommodations.csv");
+            TransportFileManager.saveTransportations(transportations,"transports.csv");
+            TripFileManager.saveTrips(trips,"trips.csv");
 
             System.out.println("All data saved !");
 
@@ -54,7 +49,7 @@ public class SmartTravelService {
     }
 
     public static boolean clientExists(String email) {
-        for (int i = 0; i < clientCount; i++) {
+        for (int i = 0; i < clients.length; i++) {
             if (clients[i].getEmail().equalsIgnoreCase(email)) {
                 return true;
             }
@@ -63,7 +58,7 @@ public class SmartTravelService {
     }
 
     public static Client findClientById(String id) throws EntityNotFoundException {
-        for (int i = 0; i < clientCount; i++) {
+        for (int i = 0; i < clients.length; i++) {
             if (clients[i].getClientId().equalsIgnoreCase(id)) {
                 return clients[i];
             }
@@ -72,7 +67,7 @@ public class SmartTravelService {
     }
 
     public static double calculateTripTotal(int index) {
-        if (index >= 0 && index < tripCount) {
+        if (index >= 0 && index < trips.length) {
             return trips[index].calculateTotalCost();
         }
         return 0.0;
@@ -125,7 +120,14 @@ public class SmartTravelService {
         if (clients.length == 0) {
             System.out.println("There is no client to edit.");
         } else {
-            String id = choiceCheckClient("edit", true);
+            String id;
+
+            try {
+                id = choiceCheckClient("edit", true);
+            } catch (EntityNotFoundException e) {
+                System.err.println(e.getMessage());
+                return;
+            }
 
             if (!id.equals("0")) {
 
@@ -165,7 +167,13 @@ public class SmartTravelService {
         if (clients.length == 0) {
             System.out.println("There is no client to delete.");
         } else {
-            String id = choiceCheckClient("delete", true);
+            String id;
+            try {
+                id = choiceCheckClient("delete", true);
+            } catch (EntityNotFoundException e) {
+                System.err.println(e.getMessage());
+                return;
+            }
 
             if (!id.equals("0")) {
 
@@ -224,11 +232,27 @@ public class SmartTravelService {
         System.out.print("Enter base price: ");
         double price = valideDoubleInput();
 
-        Client client = new Client();
+        Client client = null;
 
         if (clients.length != 0) {
-            String id = choiceCheckClient("associate to the trip", false);
-            int choice = 0;
+            String id = "";
+            boolean clientFound = false;
+
+            do {
+                try {
+                    id = choiceCheckClient("associate to the trip", true);
+
+                    if (id.equals("0"))
+                        return;
+
+                    clientFound = true;
+                } catch (EntityNotFoundException e) {
+                    System.err.println(e.getMessage());
+                    System.out.println("A trip must have a client associated try again.");
+                }
+            } while (!clientFound);
+
+            int choice = -1;
 
             for  (int i = 0; i < clients.length; i++) {
                 if (clients[i].getClientId().equalsIgnoreCase(id)) {
@@ -236,15 +260,23 @@ public class SmartTravelService {
                 }
             }
 
-            client = clients[choice];
+            if (choice != -1)
+                client = clients[choice];
 
         } else {
-            System.out.println("No client to associate please create one and add it to the trip later");
+            System.out.println("No client to associate please create one before creating a trip");
+            return;
         }
 
         if (accommodations.length != 0) {
-            String id = choiceCheckAccommodation("associate to the trip", false);
-            int choice = 0;
+            String id = "";
+            try {
+                id = choiceCheckAccommodation("associate to the trip", false);
+            } catch (EntityNotFoundException e) {
+                System.err.println(e.getMessage());
+            }
+
+            int choice = -1;
 
             for  (int i = 0; i < accommodations.length; i++) {
                 if (accommodations[i].getAccommodationId().equalsIgnoreCase(id)) {
@@ -252,44 +284,57 @@ public class SmartTravelService {
                 }
             }
 
-            accomodation = accommodations[choice];
+            if (choice != -1)
+                accomodation = accommodations[choice];
 
         } else {
-            System.out.println("No accommodation to associate please create one and add it to the trip later");
+            System.err.println("No accommodation to associate please create one and add it to the trip later");
         }
 
         if (transportations.length != 0) {
-            String choice = choiceCheckTransportation("associate to the trip", false);
-            int index = 0;
+            String id = "";
+            try {
+                id = choiceCheckTransportation("associate to the trip", false);
+            } catch (EntityNotFoundException e) {
+                System.err.println(e.getMessage());
+            }
+
+            int index = -1;
 
             for  (int i = 0; i < transportations.length; i++) {
-                if (choice.equalsIgnoreCase(transportations[i].getTransportId())) {
+                if (id.equalsIgnoreCase(transportations[i].getTransportId())) {
                     index = i;
                 }
             }
 
-            transportation = transportations[index];
+            if (index != -1)
+                transportation = transportations[index];
         } else {
-            System.out.println("No transportation to associate please create one and add it to the trip later");
+            System.err.println("No transportation to associate please create one and add it to the trip later");
         }
 
-        try {
-            Trip trip = new Trip(destination, daysDuration, price, client, accomodation, transportation);
+        if (accomodation == null && transportation == null) {
+            System.err.println("A trip must have at least an Accommodation OR a Transportation");
+        } else {
 
-            Trip[] tripsCopy = new Trip[trips.length + 1];
+            try {
+                Trip trip = new Trip(destination, daysDuration, price, client, accomodation, transportation);
 
-            for (int i = 0; i < trips.length; i++) {
-                tripsCopy[i] = trips[i];
+                Trip[] tripsCopy = new Trip[trips.length + 1];
+
+                for (int i = 0; i < trips.length; i++) {
+                    tripsCopy[i] = trips[i];
+                }
+
+                tripsCopy[tripsCopy.length - 1] = trip;
+
+                trips = tripsCopy;
+
+                System.out.println("New trip created successfully");
+
+            } catch (InvalidTripDataException e) {
+                System.err.println(e.getMessage());
             }
-
-            tripsCopy[tripsCopy.length - 1] = trip;
-
-            trips = tripsCopy;
-
-            System.out.println("New trip created successfully");
-
-        } catch (InvalidTripDataException e) {
-            System.err.println(e.getMessage());
         }
     }
 
@@ -299,9 +344,16 @@ public class SmartTravelService {
      */
     public static void editTripInformation() {
         if (trips.length != 0) {
-            String choice = choiceCheckTrip("edit", true);
+            String choice;
 
-            int choiceTrip = 0;
+            try {
+                choice = choiceCheckTrip("edit", true);
+            } catch (EntityNotFoundException e) {
+                System.err.println(e.getMessage());
+                return;
+            }
+
+            int choiceTrip = -1;
 
             for (int i = 0; i < trips.length; i++) {
                 if (trips[i].getTripId().equalsIgnoreCase(choice))
@@ -319,14 +371,18 @@ public class SmartTravelService {
                 System.out.print("Enter the new price > ");
                 double price = valideDoubleInput();
 
-                int choiceAccommodation = 0;
-                int choiceTransportation = 0;
+                int choiceAccommodation = -1;
+                int choiceTransportation = -1;
 
-                String accId;
-                String transId;
+                String accId = "";
+                String transId = "";
 
                 if (accommodations.length != 0) {
-                    accId = choiceCheckAccommodation("associate to the trip", false);
+                    try {
+                        accId = choiceCheckAccommodation("associate to the trip", false);
+                    } catch (EntityNotFoundException e) {
+                        System.err.println(e.getMessage());
+                    }
 
                     for (int i = 0; i < accommodations.length; i++) {
                         if (accId.equalsIgnoreCase(accommodations[i].getAccommodationId())) {
@@ -338,7 +394,11 @@ public class SmartTravelService {
                 }
 
                 if (transportations.length != 0) {
-                    transId = choiceCheckTransportation("associate to the trip", false);
+                    try {
+                        transId = choiceCheckTransportation("associate to the trip", false);
+                    } catch (EntityNotFoundException e) {
+                        System.err.println(e.getMessage());
+                    }
 
                     for (int i = 0; i < transportations.length; i++) {
                         if (transId.equalsIgnoreCase(transportations[i].getTransportId())) {
@@ -349,12 +409,19 @@ public class SmartTravelService {
                     System.out.println("No transportation registered add one and try again");
                 }
 
+                if (choiceAccommodation == -1 && choiceTransportation == -1) {
+                    System.err.println("A trip must have at least an accommodation or a transportation.");
+                    return;
+                }
+
                 try {
                     trips[choiceTrip].setDestination(destination);
                     trips[choiceTrip].setDurationInDays(duration);
                     trips[choiceTrip].setBasePrice(price);
-                    if (choiceAccommodation != accommodations.length && choiceTransportation != transportations.length) {
+                    if (choiceAccommodation != -1) {
                         trips[choiceTrip].setAccommodation(accommodations[choiceAccommodation]);
+                    }
+                    if (choiceTransportation != -1) {
                         trips[choiceTrip].setTransportation(transportations[choiceTransportation]);
                     }
 
@@ -375,7 +442,15 @@ public class SmartTravelService {
      */
     public static void cancelTrip() {
         if (trips.length != 0) {
-            String choice = choiceCheckTrip("cancel", true);
+            String choice = "";
+
+            try {
+                choice = choiceCheckTrip("cancel", true);
+            } catch (EntityNotFoundException e) {
+                System.err.println(e.getMessage());
+                return;
+            }
+
             int index = 0;
 
             for (int i = 0; i < trips.length; i++) {
@@ -425,7 +500,15 @@ public class SmartTravelService {
      */
     public static void listAllTripsByClient() {
         if (trips.length != 0) {
-            String choice = choiceCheckClient("see the trips of", true);
+            String choice = "";
+
+            try {
+                choice = choiceCheckClient("see the trips of", true);
+            } catch (EntityNotFoundException e) {
+                System.err.println(e.getMessage());
+                return;
+            }
+
             int index = 0;
 
             for (int i = 0; i < clients.length; i++) {
@@ -560,7 +643,14 @@ public class SmartTravelService {
             return;
         }
 
-        String id = choiceCheckTransportation("remove", true);
+        String id;
+
+        try {
+            id = choiceCheckTransportation("remove", true);
+        } catch (EntityNotFoundException e) {
+            System.err.println(e.getMessage());
+            return;
+        }
 
         if (!id.equals("0")) {
 
@@ -650,9 +740,16 @@ public class SmartTravelService {
             return;
         }
 
-        String id = choiceCheckAccommodation("remove", true);
+        String id;
 
-        if (Integer.parseInt(id) != 0) {
+        try {
+            id = choiceCheckAccommodation("remove", true);
+        } catch (EntityNotFoundException e) {
+            System.err.println(e.getMessage());
+            return;
+        }
+
+        if (!id.equals("0")) {
 
             Accommodation[] copyAccommodations = new Accommodation[accommodations.length - 1];
 
@@ -692,112 +789,104 @@ public class SmartTravelService {
         }
     }
 
-    public static String choiceCheckClient(String action, boolean exit) {
+    public static String choiceCheckClient(String action, boolean exit) throws EntityNotFoundException {
         String id;
-        boolean found = false;
 
-        do {
-            System.out.println("\nWhich client do you want to " + action + "?");
-            if (exit) {
-                System.out.print("Enter the id OR 0 to exit> ");
-                id = sc.nextLine();
-                if (id.equals("0"))
-                    break;
-            } else {
-                System.out.print("Enter the id > ");
-                id = sc.nextLine();
+        System.out.println("\nWhich client do you want to " + action + "?");
+
+        if (exit) {
+            System.out.print("Enter the id OR 0 to exit> ");
+            id = sc.nextLine();
+            if (id.equals("0"))
+                return id;
+
+        } else {
+            System.out.print("Enter the id > ");
+            id = sc.nextLine();
+        }
+
+        for (Client client: clients) {
+            if (client.getClientId().equalsIgnoreCase(id)) {
+                return id;
             }
+        }
 
-            for (Client client: clients) {
-                if (client.getClientId().equalsIgnoreCase(id)) {
-                    found = true;
-                    break;
-                }
-            }
-        } while (!found);
-
-        return id;
+        throw new EntityNotFoundException("No Client matches this Id");
     }
 
-    public static String choiceCheckTrip(String action, boolean exit) {
+    public static String choiceCheckTrip(String action, boolean exit) throws EntityNotFoundException {
         String id;
-        boolean found = false;
 
-        do {
-            System.out.println("\nWhich trip do you want to " + action + "?");
-            if (exit) {
-                System.out.print("Enter the id OR 0 to exit> ");
-                id = sc.nextLine();
-                if (id.equals("0"))
-                    break;
-            } else {
-                System.out.print("Enter the id > ");
-                id = sc.nextLine();
+        System.out.println("\nWhich trip do you want to " + action + "?");
+
+        if (exit) {
+            System.out.print("Enter the id OR 0 to exit> ");
+            id = sc.nextLine();
+            if (id.equals("0"))
+                return id;
+
+        } else {
+            System.out.print("Enter the id > ");
+            id = sc.nextLine();
+        }
+
+        for (Trip trip: trips) {
+            if (trip.getTripId().equalsIgnoreCase(id)) {
+                return id;
             }
+        }
 
-            for (Trip trip: trips) {
-                if (trip.getTripId().equalsIgnoreCase(id)) {
-                    found = true;
-                    break;
-                }
-            }
-        } while (!found);
-
-        return id;
+        throw new EntityNotFoundException("No Trip matches this Id");
     }
 
-    public static String choiceCheckTransportation(String action, boolean exit) {
+    public static String choiceCheckTransportation(String action, boolean exit) throws EntityNotFoundException {
         String id;
-        boolean found = false;
 
-        do {
-            System.out.println("\nWhich transportation do you want to " + action + "?");
-            if (exit) {
-                System.out.print("Enter the id OR 0 to exit> ");
-                id = sc.nextLine();
-                if (id.equals("0"))
-                    break;
-            } else {
-                System.out.print("Enter the id > ");
-                id = sc.nextLine();
+        System.out.println("\nWhich transportation do you want to " + action + "?");
+
+        if (exit) {
+            System.out.print("Enter the id OR 0 to exit> ");
+            id = sc.nextLine();
+            if (id.equals("0"))
+                return id;
+
+        } else {
+            System.out.print("Enter the id > ");
+            id = sc.nextLine();
+        }
+
+        for (Transportation trans: transportations) {
+            if (trans.getTransportId().equalsIgnoreCase(id)) {
+                return id;
             }
+        }
 
-            for (Transportation trans: transportations) {
-                if (trans.getTransportId().equalsIgnoreCase(id)) {
-                    found = true;
-                    break;
-                }
-            }
-        } while (!found);
-
-        return id;
+        throw new EntityNotFoundException("No Transportation matches this Id");
     }
 
-    public static String choiceCheckAccommodation(String action, boolean exit) {
+    public static String choiceCheckAccommodation(String action, boolean exit) throws EntityNotFoundException {
         String id;
-        boolean found = false;
 
-        do {
-            System.out.println("\nWhich accommodation do you want to " + action + "?");
-            if (exit) {
-                System.out.print("Enter the id OR 0 to exit> ");
-                id = sc.nextLine();
-                if (id.equals("0"))
-                    break;
-            } else {
-                System.out.print("Enter the id > ");
-                id = sc.nextLine();
+        System.out.println("\nWhich accommodation do you want to " + action + "?");
+
+        if (exit) {
+            System.out.print("Enter the id OR 0 to exit> ");
+            id = sc.nextLine();
+            if (id.equals("0"))
+                return id;
+
+        } else {
+            System.out.print("Enter the id > ");
+            id = sc.nextLine();
+        }
+
+        for (Accommodation acc: accommodations) {
+            if (acc.getAccommodationId().equalsIgnoreCase(id)) {
+                return id;
             }
+        }
 
-            for (Accommodation acc: accommodations) {
-                if (acc.getAccommodationId().equalsIgnoreCase(id)) {
-                        found = true;
-                        break;
-                }
-            }
-        } while (!found);
-
-        return id;
+        throw new EntityNotFoundException("No Accommodation matches this Id");
     }
 
     /**
@@ -972,5 +1061,21 @@ public class SmartTravelService {
                 System.out.println("Please type a valid number");
             }
         }
+    }
+
+    public static Client[] getClients() {
+        return clients;
+    }
+
+    public static Trip[] getTrips() {
+        return trips;
+    }
+
+    public static Accommodation[] getAccommodations() {
+        return accommodations;
+    }
+
+    public static Transportation[] getTransportations() {
+        return transportations;
     }
 }

@@ -66,7 +66,7 @@ public class SmartTravelDriver {
         try {
             accommodations = new Accommodation[] {
                     new Hotel("Marriott", "Barcelona", 100, 4),
-                    new Hostel("SleepInPeace", "Vancouver", 90, 3, 2)
+                    new Hostel("SleepInPeace", "Vancouver", 90, 2)
             };
         } catch (InvalidAccommodationDataException e) {
             throw new RuntimeException(e);
