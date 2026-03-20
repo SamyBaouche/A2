@@ -5,11 +5,13 @@ import exceptions.InvalidAccommodationDataException;
 import exceptions.InvalidClientDataException;
 import exceptions.InvalidTransportDataException;
 import exceptions.InvalidTripDataException;
+import persistence.ErrorLogger;
 import travel.*;
 
 import service.SmartTravelService;
 import visualization.DashboardGenerator;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 //-----------------------------------------------------
@@ -103,7 +105,11 @@ public class SmartTravelDriver {
                         }
 
                         case 10 -> {
-                            //visualization.DashboardGenerator.generateDashboard();
+                            try {
+                                visualization.DashboardGenerator.generateDashboard();
+                            } catch (IOException e) {
+                                ErrorLogger.log(e.getMessage());
+                            }
                         }
 
                         case 0 -> {
@@ -212,7 +218,6 @@ public class SmartTravelDriver {
             System.out.print("> ");
 
             choice = SmartTravelService.valideIntegerInput();
-            sc.nextLine();
         } while (choice < 0 || choice > 5);
 
         switch (choice) {
@@ -259,7 +264,6 @@ public class SmartTravelDriver {
             System.out.print("> ");
 
             choice = SmartTravelService.valideIntegerInput();
-            sc.nextLine();
         } while (choice < 0 || choice > 3);
 
         switch (choice) {
@@ -294,7 +298,6 @@ public class SmartTravelDriver {
             System.out.print("> ");
 
             choice = SmartTravelService.valideIntegerInput();
-            sc.nextLine();
         } while (choice < 0 || choice > 3);
 
         switch (choice) {
@@ -323,7 +326,7 @@ public class SmartTravelDriver {
 
         //3 Clients
         Client client1 = new Client("Jacob", "Delaire", "jacob.delaire@gmail.com");
-        Client client2 = new Client("Nathan", "Blo", "nathan.blo@gmail.com");
+        Client client2 = new Client("Nathan", "Blo", "nathanblogmailcom"); //Exception example for the email
         Client client3 = new Client("Mohammed", "Baouche", "mohammed.baouche@gmail.com");
 
         //2 Flights
@@ -353,37 +356,50 @@ public class SmartTravelDriver {
 
         //Arrays for objects
 
-        //Clients Array (for 3 clients)
-        Client[] clientsPredef = {client1, client2, client3};
+        //Clients Array predefined
+        SmartTravelService.addClientPredefined(client1);
+        SmartTravelService.addClientPredefined(client2);
+        SmartTravelService.addClientPredefined(client3);
 
-        //Trips Array
-        Trip[] tripsPredef = {trip1, trip2, trip3};
 
-        //Transportation Array
-        Transportation[] transportationsPredef = {train1, train2, bus1, bus2, flight1, flight2};
+        //Trips Array predefined
+        SmartTravelService.addTripPredefined(trip1);
+        SmartTravelService.addTripPredefined(trip2);
+        SmartTravelService.addTripPredefined(trip3);
 
-        //Accomodation Array
-        Accommodation[] accommodationsPredef = {hotel1, hotel2, hostel1, hostel2};
+        //Transportation Array predefined
+        SmartTravelService.addTransportationPredefined(flight1);
+        SmartTravelService.addTransportationPredefined(flight2);
+        SmartTravelService.addTransportationPredefined(bus1);
+        SmartTravelService.addTransportationPredefined(bus2);
+        SmartTravelService.addTransportationPredefined(train1);
+        SmartTravelService.addTransportationPredefined(train2);
+
+        //Accomodation Array predefined
+        SmartTravelService.addAccommodationPredefined(hotel1);
+        SmartTravelService.addAccommodationPredefined(hotel2);
+        SmartTravelService.addAccommodationPredefined(hostel1);
+        SmartTravelService.addAccommodationPredefined(hostel2);
 
         System.out.println("\n      2. Display all created objects\n");
 
         System.out.println("Clients:");
-        for (Client client: clientsPredef) {
+        for (Client client: SmartTravelService.getClients()) {
             System.out.println("    " + client);
         }
 
         System.out.println("\nTrips:");
-        for (Trip trip: tripsPredef) {
+        for (Trip trip: SmartTravelService.getTrips()) {
             System.out.println("    " + trip);
         }
 
         System.out.println("\nTransportation Options:");
-        for (Transportation transportation: transportationsPredef) {
+        for (Transportation transportation: SmartTravelService.getTransportations()) {
             System.out.println("    " + transportation);
         }
 
         System.out.println("\nAccommodations");
-        for (Accommodation accommodation: accommodationsPredef) {
+        for (Accommodation accommodation: SmartTravelService.getAccommodations()) {
             System.out.println("    " + accommodation);
         }
 
@@ -396,21 +412,21 @@ public class SmartTravelDriver {
         System.out.println(train1.equals(train2));
 
         System.out.println("\n      4. Cost of the Trips\n");
-        for (Trip trip: tripsPredef) {
+        for (Trip trip: SmartTravelService.getTrips()) {
             System.out.println(trip.getTripId() + ": " + trip.calculateTotalCost() + "$");
         }
 
         System.out.println("\n      5. Most expensive Trip\n" );
-        SmartTravelService.mostExpensiveTrip(tripsPredef);
+        SmartTravelService.mostExpensiveTrip(SmartTravelService.getTrips());
 
         System.out.println("\n      6. Deep copie of the Transportation Array\n");
 
         System.out.println("Making the deep copy...\n");
-        Transportation[] transportationsCopy = SmartTravelService.copyTransportationArray(transportationsPredef);
+        Transportation[] transportationsCopy = SmartTravelService.copyTransportationArray(SmartTravelService.getTransportations());
 
         System.out.println("-- Displaying both Arrays --\n");
         System.out.println("Original");
-        for (Transportation transportation: transportationsPredef) {
+        for (Transportation transportation: SmartTravelService.getTransportations()) {
             System.out.println("    " + transportation);
         }
 
@@ -425,13 +441,50 @@ public class SmartTravelDriver {
         System.out.println("-- Display both Arrays AFTER MODIFICATION --\n");
 
         System.out.println("Original");
-        for (Transportation transportation: transportationsPredef) {
+        for (Transportation transportation: SmartTravelService.getTransportations()) {
             System.out.println("    " + transportation);
         }
 
         System.out.println("\nCopy");
         for (Transportation transportation: transportationsCopy) {
             System.out.println("    " + transportation);
+        }
+
+        //Save All Data
+        System.out.println("\n      7. Saving all data to files\n");
+        SmartTravelService.saveAllData();
+
+        //Clear all data from memory for test
+        SmartTravelService.clearAllData();
+
+        //Display all data after clearing to confirm it's empty
+        System.out.println("\n      8. Displaying all data after clearing \n");
+        SmartTravelService.displayClients();
+        SmartTravelService.listAllTrips();
+        SmartTravelService.listTransportationOptions();
+        SmartTravelService.listAccommodationByType();
+
+        //Load All Data
+        System.out.println("\n      9. Loading all data from files\n");
+        SmartTravelService.loadAllData();
+
+        //Display all data after loading to confirm it's back
+        System.out.println("\n      10. Displaying all data after loading \n");
+        System.out.println("Clients:");
+        SmartTravelService.displayClients();
+        System.out.println("\nTrips:");
+        SmartTravelService.listAllTrips();
+        System.out.println("\nTransportation Options:");
+        SmartTravelService.listTransportationOptions();
+        System.out.println("\nAccommodations");
+        SmartTravelService.listAccommodationByType();
+
+        //Generate Dashboard
+        System.out.println("\n      11. Generating Dashboard\n");
+        try {
+            DashboardGenerator.generateDashboard();
+        } catch (IOException e) {
+            ErrorLogger.log(e.getMessage());
         }
     }
 }

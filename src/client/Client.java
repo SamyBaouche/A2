@@ -4,6 +4,9 @@ import exceptions.InvalidClientDataException;
 
 import java.util.Objects;
 
+import service.SmartTravelService;
+import travel.Trip;
+
 /**
  * The Client class represents a customer in the travel system.
  * Each client has a unique ID, a first name, a last name, and an email.
@@ -15,7 +18,7 @@ public class Client {
     private String lastName;
     private String email;
 
-    private double amountSpent; // New attribute for A2 to track total spending
+    private double totalSpent; // New attribute for A2 to track total spending
 
     private static int idCounter = 1001;
 
@@ -31,6 +34,7 @@ public class Client {
         this.firstName = "";
         this.lastName = "";
         this.email = "";
+        this.totalSpent = 0.0;
     }
 
     /**
@@ -64,7 +68,7 @@ public class Client {
         setFirstName(firstName);
         setLastName(lastName);
         setEmail(email);
-        this.amountSpent = 0.0;
+        this.totalSpent = 0.0;
     }
 
     /**
@@ -79,7 +83,7 @@ public class Client {
         this.firstName = other.firstName;
         this.lastName = other.lastName;
         this.email = other.email;
-
+        this.totalSpent = other.totalSpent;
     }
 
     public Client(String id, String firstName, String lastName, String email) throws InvalidClientDataException {
@@ -119,8 +123,6 @@ public class Client {
     public String getEmail() {
         return email;
     }
-    public double getAmountSpent() { return amountSpent; }
-
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
@@ -151,12 +153,19 @@ public class Client {
     }
 
 
-    public void addAmountSpent(double amount) {
-        if (amount > 0) {
-            this.amountSpent += amount;
-        }
-    }
+    public double getTotalSpent() {
+        Trip[] trips = SmartTravelService.getTrips();
 
+        double total = 0.0;
+
+        for (Trip trip : trips) {
+            if (trip.getClientAssociated().getClientId().equals(this.clientId)) {
+                total += trip.calculateTotalCost();
+            }
+        }
+
+        return total;
+    }
 
     /**
      * Returns a formatted string representation of the Client object.

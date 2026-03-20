@@ -48,32 +48,6 @@ public class SmartTravelService {
         }
     }
 
-    public static boolean clientExists(String email) {
-        for (int i = 0; i < clients.length; i++) {
-            if (clients[i].getEmail().equalsIgnoreCase(email)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static Client findClientById(String id) throws EntityNotFoundException {
-        for (int i = 0; i < clients.length; i++) {
-            if (clients[i].getClientId().equalsIgnoreCase(id)) {
-                return clients[i];
-            }
-        }
-        throw new EntityNotFoundException("Client with ID " + id + " was not found.");
-    }
-
-    public static double calculateTripTotal(int index) {
-        if (index >= 0 && index < trips.length) {
-            return trips[index].calculateTotalCost();
-        }
-        return 0.0;
-    }
-
-
     /**
      * addClient(): Prompts user for client information and adds it to the client array.
      */
@@ -1058,12 +1032,56 @@ public class SmartTravelService {
     public static double valideDoubleInput() {
         while (true) {
             try {
-                return sc.nextDouble();
+                String s = sc.nextLine();
+                return Double.parseDouble(s);
             } catch (InputMismatchException e) {
                 System.out.println("Please type a valid number");
                 sc.nextLine();
             }
         }
+    }
+
+    public static void addClientPredefined(Client client) {
+        Client[] copyClients = new Client[clients.length + 1];
+        for (int i = 0; i < clients.length; i++) {
+            copyClients[i] = clients[i];
+        }
+        copyClients[copyClients.length - 1] = client;
+        clients = copyClients;
+    }
+
+    public static void addTripPredefined(Trip trip) {
+        Trip[] copyTrips = new Trip[trips.length + 1];
+        for (int i = 0; i < trips.length; i++) {
+            copyTrips[i] = trips[i];
+        }
+        copyTrips[copyTrips.length - 1] = trip;
+        trips = copyTrips;
+    }
+
+    public static void addAccommodationPredefined(Accommodation accommodation) {
+        Accommodation[] copyAccommodations = new Accommodation[accommodations.length + 1];
+        for (int i = 0; i < accommodations.length; i++) {
+            copyAccommodations[i] = accommodations[i];
+        }
+        copyAccommodations[copyAccommodations.length - 1] = accommodation;
+        accommodations = copyAccommodations;
+    }
+
+    public static void addTransportationPredefined(Transportation transportation) {
+        Transportation[] copyTransportations = new Transportation[transportations.length + 1];
+        for (int i = 0; i < transportations.length; i++) {
+            copyTransportations[i] = transportations[i];
+        }
+        copyTransportations[copyTransportations.length - 1] = transportation;
+        transportations = copyTransportations;
+    }
+
+    public static void clearAllData() {
+        clients = new Client[0];
+        trips = new Trip[0];
+        accommodations = new Accommodation[0];
+        transportations = new Transportation[0];
     }
 
     public static Client[] getClients() {

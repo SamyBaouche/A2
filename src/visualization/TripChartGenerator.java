@@ -84,12 +84,11 @@ public class TripChartGenerator {
      * Generates a Bar chart showing total cost per trip.
      *
      * @param trips array of Trip objects
-     * @param count number of valid elements in the array
      * @throws IOException if PNG file cannot be written
      */
-    public static void generateCostBarChart(Trip[] trips, int count) throws IOException, InvalidAccommodationDataException {
+    public static void generateCostBarChart(Trip[] trips) throws IOException {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < trips.length; i++) {
             dataset.addValue(trips[i].calculateTotalCost(), "Total Cost", trips[i].getTripId());
         }
 
@@ -108,15 +107,14 @@ public class TripChartGenerator {
      * Generates a Pie chart showing distribution of trips per destination.
      *
      * @param trips array of Trip objects
-     * @param count number of valid elements in the array
      * @throws IOException if PNG file cannot be written
      */
-    public static void generateDestinationPieChart(Trip[] trips, int count) throws IOException {
+    public static void generateDestinationPieChart(Trip[] trips) throws IOException {
         
     	DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
 
         // Count trips per destination
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < trips.length; i++) {
             String destination = trips[i].getDestination();
             if (dataset.getIndex(destination) != -1) {
                 double value = dataset.getValue(destination).doubleValue();
@@ -141,12 +139,11 @@ public class TripChartGenerator {
      * Generates a Line chart showing trip duration over Trip IDs.
      *
      * @param trips array of Trip objects
-     * @param count number of valid elements in the array
      * @throws IOException if PNG file cannot be written
      */
-    public static void generateDurationLineChart(Trip[] trips, int count) throws IOException {
+    public static void generateDurationLineChart(Trip[] trips) throws IOException {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < trips.length; i++) {
             dataset.addValue(trips[i].getDurationInDays(), "Duration (days)", trips[i].getTripId());
         }
 
