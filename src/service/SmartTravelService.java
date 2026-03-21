@@ -12,6 +12,12 @@ import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+//-----------------------------------------------------
+// Assignment 2
+// Question: 1 (only one)
+// Written by: Mohammed El Ouaabani 40338377, Samy Baouche 40336149
+//-----------------------------------------------------
+
 public class SmartTravelService {
 
     static Scanner sc = new Scanner(System.in);
@@ -21,6 +27,9 @@ public class SmartTravelService {
     private static Accommodation[] accommodations = new Accommodation[0];
     private static Transportation[] transportations = new Transportation[0];
 
+    /**
+     * Loads all data from CSV files into the application.
+     */
     public static void loadAllData(){
         try {
             clients = ClientFileManager.loadClients("output/data/clients.csv");
@@ -34,6 +43,9 @@ public class SmartTravelService {
         }
     }
 
+    /**
+     * Saves all current data to CSV files.
+     */
     public static void saveAllData(){
         try {
             ClientFileManager.saveClients(clients,"output/data/clients.csv");
@@ -48,6 +60,9 @@ public class SmartTravelService {
         }
     }
 
+    /**
+     * Clears all data from memory.
+     */
     public static void clearAllData() {
         clients = new Client[0];
         trips = new Trip[0];
@@ -770,6 +785,13 @@ public class SmartTravelService {
         }
     }
 
+    /**
+     * Helper method to prompt user to select a client by ID.
+     * @param action The action being performed (for display).
+     * @param exit Whether the user can choose to exit (enter "0").
+     * @return The selected client ID, or "0" if exited.
+     * @throws EntityNotFoundException if the ID is not found.
+     */
     public static String choiceCheckClient(String action, boolean exit) throws EntityNotFoundException {
         String id;
 
@@ -795,6 +817,13 @@ public class SmartTravelService {
         throw new EntityNotFoundException("No Client matches this Id");
     }
 
+    /**
+     * Helper method to prompt user to select a trip by ID.
+     * @param action The action being performed.
+     * @param exit Whether the user can choose to exit.
+     * @return The selected trip ID.
+     * @throws EntityNotFoundException if the ID is not found.
+     */
     public static String choiceCheckTrip(String action, boolean exit) throws EntityNotFoundException {
         String id;
 
@@ -820,6 +849,13 @@ public class SmartTravelService {
         throw new EntityNotFoundException("No Trip matches this Id");
     }
 
+    /**
+     * Helper method to prompt user to select a transportation by ID.
+     * @param action The action being performed.
+     * @param exit Whether the user can choose to exit.
+     * @return The selected transportation ID.
+     * @throws EntityNotFoundException if the ID is not found.
+     */
     public static String choiceCheckTransportation(String action, boolean exit) throws EntityNotFoundException {
         String id;
 
@@ -845,6 +881,13 @@ public class SmartTravelService {
         throw new EntityNotFoundException("No Transportation matches this Id");
     }
 
+    /**
+     * Helper method to prompt user to select an accommodation by ID.
+     * @param action The action being performed.
+     * @param exit Whether the user can choose to exit.
+     * @return The selected accommodation ID.
+     * @throws EntityNotFoundException if the ID is not found.
+     */
     public static String choiceCheckAccommodation(String action, boolean exit) throws EntityNotFoundException {
         String id;
 
@@ -955,6 +998,10 @@ public class SmartTravelService {
     }
 
     // --- Additional Operations ---
+    /**
+     * Finds and displays the most expensive trip in the provided array.
+     * @param trips The array of trips to check.
+     */
     public static void mostExpensiveTrip(Trip[] trips) {
 
         if (trips != null && trips.length != 0) {
@@ -1018,6 +1065,10 @@ public class SmartTravelService {
 
     }
 
+    /**
+     * Validates and returns an integer input from the user.
+     * @return A valid integer.
+     */
     public static int valideIntegerInput() {
         while (true) {
             try {
@@ -1030,6 +1081,10 @@ public class SmartTravelService {
         }
     }
 
+    /**
+     * Validates and returns a double input from the user.
+     * @return A valid double.
+     */
     public static double valideDoubleInput() {
         while (true) {
             try {
@@ -1042,6 +1097,10 @@ public class SmartTravelService {
         }
     }
 
+    /**
+     * Adds a predefined client to the list (for testing/setup).
+     * @param client The client to add.
+     */
     public static void addClientPredefined(Client client) {
         Client[] copyClients = new Client[clients.length + 1];
         for (int i = 0; i < clients.length; i++) {
@@ -1051,6 +1110,10 @@ public class SmartTravelService {
         clients = copyClients;
     }
 
+    /**
+     * Adds a predefined trip to the list (for testing/setup).
+     * @param trip The trip to add.
+     */
     public static void addTripPredefined(Trip trip) {
         Trip[] copyTrips = new Trip[trips.length + 1];
         for (int i = 0; i < trips.length; i++) {
@@ -1060,6 +1123,10 @@ public class SmartTravelService {
         trips = copyTrips;
     }
 
+    /**
+     * Adds a predefined accommodation to the list (for testing/setup).
+     * @param accommodation The accommodation to add.
+     */
     public static void addAccommodationPredefined(Accommodation accommodation) {
         Accommodation[] copyAccommodations = new Accommodation[accommodations.length + 1];
         for (int i = 0; i < accommodations.length; i++) {
@@ -1069,6 +1136,10 @@ public class SmartTravelService {
         accommodations = copyAccommodations;
     }
 
+    /**
+     * Adds a predefined transportation to the list (for testing/setup).
+     * @param transportation The transportation to add.
+     */
     public static void addTransportationPredefined(Transportation transportation) {
         Transportation[] copyTransportations = new Transportation[transportations.length + 1];
         for (int i = 0; i < transportations.length; i++) {
@@ -1078,6 +1149,11 @@ public class SmartTravelService {
         transportations = copyTransportations;
     }
 
+    /**
+     * Finds a client by ID and prints their details.
+     * @param clientId The ID to search for.
+     * @throws EntityNotFoundException if the client is not found.
+     */
     public static void findClientById(String clientId) throws EntityNotFoundException {
         for (Client client : clients) {
             if (client.getClientId().equalsIgnoreCase(clientId)) {
@@ -1088,18 +1164,34 @@ public class SmartTravelService {
         throw new EntityNotFoundException("Client not found");
     }
 
+    /**
+     * Gets the list of all clients.
+     * @return Array of clients.
+     */
     public static Client[] getClients() {
         return clients;
     }
 
+    /**
+     * Gets the list of all trips.
+     * @return Array of trips.
+     */
     public static Trip[] getTrips() {
         return trips;
     }
 
+    /**
+     * Gets the list of all accommodations.
+     * @return Array of accommodations.
+     */
     public static Accommodation[] getAccommodations() {
         return accommodations;
     }
 
+    /**
+     * Gets the list of all transportations.
+     * @return Array of transportations.
+     */
     public static Transportation[] getTransportations() {
         return transportations;
     }

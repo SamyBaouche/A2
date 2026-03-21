@@ -44,6 +44,12 @@ public class ClientFileManager {
         pw.close();
     }
 
+    /**
+     * Loads the clients array from a CSV file.
+     * @param filePath The path to the CSV file.
+     * @return An array of Client objects.
+     * @throws IOException If anything goes wrong.
+     */
     public static Client[] loadClients(String filePath) throws IOException {
 
         Client[] clients = new Client[0];

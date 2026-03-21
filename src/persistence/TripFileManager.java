@@ -60,6 +60,15 @@ public class TripFileManager {
         pw.close();
     }
 
+    /**
+     * Loads the trips array from a CSV file.
+     * @param filePath The path to the CSV file.
+     * @param clients The array of clients available.
+     * @param acc The array of accommodations available.
+     * @param trans The array of transportations available.
+     * @return An array of Trip objects.
+     * @throws IOException If the file cannot be read.
+     */
     public static Trip[] loadTrips(String filePath, Client[] clients, Accommodation[] acc, Transportation[] trans) throws IOException {
         Scanner inFile = null;
         boolean fileFound = true;

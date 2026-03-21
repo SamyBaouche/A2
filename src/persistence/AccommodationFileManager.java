@@ -55,6 +55,12 @@ public class AccommodationFileManager {
         pw.close();
     }
 
+    /**
+     * Loads the accommodations array from a CSV file.
+     * @param filePath The path to the CSV file.
+     * @return An array of Accommodations.
+     * @throws IOException If anything goes wrong.
+     */
     public static Accommodation[] loadAccommodations(String filePath) throws IOException {
 
         Accommodation[] accoms = new Accommodation[0];

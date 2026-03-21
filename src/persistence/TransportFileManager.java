@@ -11,6 +11,12 @@ import java.util.Scanner;
 
 public class TransportFileManager {
 
+    /**
+     * Saves the transportations array to a CSV file.
+     * @param transports The array of transportations to save.
+     * @param filePath The path to the CSV file.
+     * @throws IOException If the file cannot be written.
+     */
     public static void saveTransportations(Transportation[] transports, String filePath) throws IOException {
 
         File file = new File(filePath);
@@ -53,6 +59,12 @@ public class TransportFileManager {
         pw.close();
     }
 
+    /**
+     * Loads the transportations array from a CSV file.
+     * @param filePath The path to the CSV file.
+     * @return An array of Transportation objects.
+     * @throws IOException If the file cannot be read.
+     */
     public static Transportation[] loadTransportations(String filePath) throws IOException {
 
         File file = new File(filePath);
