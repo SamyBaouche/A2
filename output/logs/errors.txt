@@ -94,3 +94,47 @@ Error: Hostel price must be less than $150 per night.
 Error: Star rating must be between 1 and 5.
 Error: Price per night must be greater than $0.
 Error: Number of nights must be at least 1.
+Error: Your first name can't longer than 50 characters
+Error: Client not found
+Error: Invalid email format. Must contain @ and ., have no spaces, and be 100 characters or less.
+Error: This email is already associated with another client.
+Error: Base price must be positive and over $100.
+Error: A Bus requires at least 1 stop.
+Error: Luggage allowance cannot be negative.
+Error: Hostel price must be less than $150 per night.
+Error: Star rating must be between 1 and 5.
+Error: Price per night must be greater than $0.
+Error: Number of nights must be at least 1.
+Error: Your first name can't longer than 50 characters
+Error: Client not found
+Error: Invalid email format. Must contain @ and ., have no spaces, and be 100 characters or less.
+Error: This email is already associated with another client.
+Error: Base price must be positive and over $100.
+Error: A Bus requires at least 1 stop.
+Error: Luggage allowance cannot be negative.
+Error: Hostel price must be less than $150 per night.
+Error: Star rating must be between 1 and 5.
+Error: Price per night must be greater than $0.
+Error: Number of nights must be at least 1.
+Error: Your first name can't longer than 50 characters
+Error: Client not found
+Error: Invalid email format. Must contain @ and ., have no spaces, and be 100 characters or less.
+Error: This email is already associated with another client.
+Error: Base price must be positive and over $100.
+Error: A Bus requires at least 1 stop.
+Error: Luggage allowance cannot be negative.
+Error: Hostel price must be less than $150 per night.
+Error: Star rating must be between 1 and 5.
+Error: Price per night must be greater than $0.
+Error: Number of nights must be at least 1.
+Error: Your first name can't longer than 50 characters
+Error: Client not found
+Error: Invalid email format. Must contain @ and ., have no spaces, and be 100 characters or less.
+Error: This email is already associated with another client.
+Error: Base price must be positive and over $100.
+Error: A Bus requires at least 1 stop.
+Error: Luggage allowance cannot be negative.
+Error: Hostel price must be less than $150 per night.
+Error: Star rating must be between 1 and 5.
+Error: Price per night must be greater than $0.
+Error: Number of nights must be at least 1.

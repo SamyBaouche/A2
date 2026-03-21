@@ -51,7 +51,7 @@ public class Trip {
     public Trip() throws InvalidTripDataException {
         this.tripID = "T" + tripIdCounter++;
         this.destination = "Unknown";
-        setBasePrice(0);
+        setBasePrice(100);
         setDurationInDays(1); // Rule: 1-20 days
     }
 
@@ -188,7 +188,7 @@ public class Trip {
     public void setDurationInDays(int durationDays) throws InvalidTripDataException {
         // Rule: 1-20 days
         if (durationDays < 1 || durationDays > 20) {
-            throw new InvalidTripDataException("Trip duration must be between 1 and 60 days.");
+            throw new InvalidTripDataException("Trip duration must be between 1 and 20 days.");
         }
         this.durationInDays = durationDays;
     }

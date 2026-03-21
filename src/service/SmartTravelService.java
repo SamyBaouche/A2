@@ -48,6 +48,13 @@ public class SmartTravelService {
         }
     }
 
+    public static void clearAllData() {
+        clients = new Client[0];
+        trips = new Trip[0];
+        accommodations = new Accommodation[0];
+        transportations = new Transportation[0];
+    }
+
     /**
      * addClient(): Prompts user for client information and adds it to the client array.
      */
@@ -955,12 +962,6 @@ public class SmartTravelService {
 
             Trip mostExpensiveTrip = null;
 
-            try {
-                mostExpensiveTrip = new Trip();
-            } catch (InvalidTripDataException e) {
-                System.err.println(e.getMessage());
-            }
-
             for (Trip trip : trips) {
                 double costTrip = trip.calculateTotalCost();
                 if (costTrip > topPrice) {
@@ -1022,7 +1023,7 @@ public class SmartTravelService {
             try {
                 String s = sc.nextLine();
                 return Integer.parseInt(s);
-            } catch (InputMismatchException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("Please type a valid number");
                 sc.nextLine();
             }
@@ -1034,7 +1035,7 @@ public class SmartTravelService {
             try {
                 String s = sc.nextLine();
                 return Double.parseDouble(s);
-            } catch (InputMismatchException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("Please type a valid number");
                 sc.nextLine();
             }
@@ -1075,13 +1076,6 @@ public class SmartTravelService {
         }
         copyTransportations[copyTransportations.length - 1] = transportation;
         transportations = copyTransportations;
-    }
-
-    public static void clearAllData() {
-        clients = new Client[0];
-        trips = new Trip[0];
-        accommodations = new Accommodation[0];
-        transportations = new Transportation[0];
     }
 
     public static void findClientById(String clientId) throws EntityNotFoundException {
