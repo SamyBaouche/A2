@@ -76,6 +76,11 @@ public class SmartTravelService {
 
     public static void addClient() {
 
+        if (clients.length >= 100) {
+            System.err.println("Maximum number of clients reached. Cannot add more.");
+            return;
+        }
+
         try {
             System.out.print("Enter client First Name: ");
             String firstName = sc.nextLine();
@@ -219,6 +224,11 @@ public class SmartTravelService {
      * Adds the trip to the trips array.
      */
     public static void createTrip() {
+
+        if (trips.length >= 200) {
+            System.err.println("Maximum number of trips reached. Cannot add more.");
+            return;
+        }
 
         Accommodation accomodation = null;
         Transportation transportation = null;
@@ -532,6 +542,11 @@ public class SmartTravelService {
      */
     public static void addTransportation() {
 
+        if (transportations.length >= 50) {
+            System.err.println("Maximum number of transportation options reached. Cannot add more.");
+            return;
+        }
+
         int type;
 
         do {
@@ -670,6 +685,11 @@ public class SmartTravelService {
      * Prompts for type-specific info and appends to accommodations array.
      */
     public static void addAccommodation() {
+
+        if (accommodations.length >= 50) {
+            System.err.println("Maximum number of accommodation options reached. Cannot add more.");
+            return;
+        }
 
         int type;
 
@@ -1102,6 +1122,11 @@ public class SmartTravelService {
      * @param client The client to add.
      */
     public static void addClientPredefined(Client client) {
+        if (clients.length >= 100) {
+            System.err.println("Maximum number of clients reached. Cannot add more.");
+            return;
+        }
+
         Client[] copyClients = new Client[clients.length + 1];
         for (int i = 0; i < clients.length; i++) {
             copyClients[i] = clients[i];
@@ -1128,6 +1153,12 @@ public class SmartTravelService {
      * @param accommodation The accommodation to add.
      */
     public static void addAccommodationPredefined(Accommodation accommodation) {
+
+        if (accommodations.length >= 50) {
+            System.err.println("Maximum number of accommodation options reached. Cannot add more.");
+            return;
+        }
+
         Accommodation[] copyAccommodations = new Accommodation[accommodations.length + 1];
         for (int i = 0; i < accommodations.length; i++) {
             copyAccommodations[i] = accommodations[i];
@@ -1141,6 +1172,12 @@ public class SmartTravelService {
      * @param transportation The transportation to add.
      */
     public static void addTransportationPredefined(Transportation transportation) {
+
+        if (transportations.length >= 50) {
+            System.err.println("Maximum number of transportation options reached. Cannot add more.");
+            return;
+        }
+
         Transportation[] copyTransportations = new Transportation[transportations.length + 1];
         for (int i = 0; i < transportations.length; i++) {
             copyTransportations[i] = transportations[i];
