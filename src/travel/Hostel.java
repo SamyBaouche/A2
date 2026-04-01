@@ -106,5 +106,54 @@ public class Hostel extends Accommodation {
         }
         return (pricePerNight * numberOfDays) / sharedBeds;
     }
+
+    @Override
+    public String toCsvRow() {
+        // Format: Type; ID; Name; Location; PricePerNight; SharedBeds
+        // We include "Hostel" at the beginning so the file reader knows what object to build
+        return "HOSTEL;" + getAccommodationId() + ";" + getName() + ";" +
+                getLocation() + ";" + getPricePerNight() + ";" + sharedBeds;
+    }
+
+    @Override
+    public String getId() {
+        // Fulfills the Identifiable interface using the parent's ID
+        return getAccommodationId();
+    }
+
+    @Override
+    public int compareTo(Accommodation o) {
+        return Double.compare(o.getPricePerNight(), this.getPricePerNight());
+    }
+
+    /**
+     * Parses one CSV row into a fully-formed Hostel object[cite: 106, 107].
+     */
+    public static Hostel fromCsvRow(String csvLine) throws InvalidAccommodationDataException {
+
+        if (csvLine == null || csvLine.trim().isEmpty()) {
+            throw new InvalidAccommodationDataException("CSV line is empty.");
+        }
+
+        String[] parts = csvLine.split(";");
+
+        // Expecting 6 parts based on toCsvRow: Type, ID, Name, Location, Price, SharedBeds
+        if (parts.length < 6) {
+            throw new InvalidAccommodationDataException("Invalid number of fields for Hostel.");
+        }
+
+        try {
+            // parts[0] is "Hostel", so we skip to parts[1] for the ID
+            String id = parts[1].trim();
+            String name = parts[2].trim();
+            String location = parts[3].trim();
+            double price = Double.parseDouble(parts[4].trim());
+            int beds = Integer.parseInt(parts[5].trim());
+
+            return new Hostel(id, name, location, price, beds);
+        } catch (NumberFormatException e) {
+            throw new InvalidAccommodationDataException("Error parsing numerical values for Hostel: " + e.getMessage());
+        }
+    }
 }
 

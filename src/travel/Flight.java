@@ -112,4 +112,45 @@ public class Flight extends Transportation {
         //Implemented luggageAllowance into the cost calcul
         return BASE_FLIGHT_PRICE + (luggageAllowance * 1);
     }
+
+    @Override
+    public String toCsvRow() {
+        // Format: Type; ID; Company; Departure; Arrival; Price; LuggageAllowance
+        return "FLIGHT;" + getTransportId() + ";" + getCompanyName() + ";" +
+                getDepartureCity() + ";" + getArrivalCity() + ";" + getPrice() + ";" +
+                luggageAllowance;
+    }
+
+    @Override
+    public String getId() {
+        // Fulfills Identifiable
+        return getTransportId();
+    }
+
+
+    public static Flight fromCsvRow(String csvLine) throws InvalidTransportDataException {
+        if (csvLine == null || csvLine.trim().isEmpty()) {
+            throw new InvalidTransportDataException("CSV line is empty.");
+        }
+
+        String[] parts = csvLine.split(";");
+
+        if (parts.length < 7) {
+            throw new InvalidTransportDataException("Invalid number of fields for Flight.");
+        }
+
+        try {
+            // parts[0] is "Flight"
+            String id = parts[1].trim();
+            String company = parts[2].trim();
+            String departure = parts[3].trim();
+            String arrival = parts[4].trim();
+            double price = Double.parseDouble(parts[5].trim());
+            double luggage = Double.parseDouble(parts[6].trim());
+
+            return new Flight(id, company, departure, arrival, price, luggage);
+        } catch (NumberFormatException e) {
+            throw new InvalidTransportDataException("Error parsing numerical values for Flight: " + e.getMessage());
+        }
+    }
 }

@@ -9,7 +9,9 @@ import persistence.TripFileManager;
 import travel.*;
 
 import java.io.IOException;
-import java.util.InputMismatchException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 //-----------------------------------------------------
@@ -22,20 +24,54 @@ public class SmartTravelService {
 
     static Scanner sc = new Scanner(System.in);
 
-    private static Client[] clients = new Client[0];
-    private static Trip[] trips = new Trip[0];
-    private static Accommodation[] accommodations = new Accommodation[0];
-    private static Transportation[] transportations = new Transportation[0];
+    private static List<Client> clients = new ArrayList<>();
+    private static List<Trip> trips = new ArrayList<>();
+    private static List<Accommodation> accommodations = new ArrayList<>();
+    private static List<Transportation> transportations = new ArrayList<>();
+
+    // Part 3 (Generic Repository Pattern): mirror copies used for queries (find/filter/sort)
+    private static Repository<Client> clientRepo = new Repository<>();
+    private static Repository<Trip> tripRepo = new Repository<>();
+    private static Repository<Accommodation> accommodationRepo = new Repository<>();
+    private static Repository<Transportation> transportationRepo = new Repository<>();
 
     /**
      * Loads all data from CSV files into the application.
      */
     public static void loadAllData(){
         try {
-            clients = ClientFileManager.loadClients("output/data/clients.csv");
-            accommodations = AccommodationFileManager.loadAccommodations("output/data/accommodations.csv");
-            transportations = TransportFileManager.loadTransportations("output/data/transports.csv");
-            trips = TripFileManager.loadTrips("output/data/trips.csv",clients,accommodations,transportations);
+            Client[] loadedClients = ClientFileManager.loadClients("output/data/clients.csv");
+            Accommodation[] loadedAccommodations = AccommodationFileManager.loadAccommodations("output/data/accommodations.csv");
+            Transportation[] loadedTransportations = TransportFileManager.loadTransportations("output/data/transports.csv");
+
+            clients = new ArrayList<>();
+            accommodations = new ArrayList<>();
+            transportations = new ArrayList<>();
+
+            // Reset repos as well (mirror copy used for queries)
+            clientRepo = new Repository<>();
+            accommodationRepo = new Repository<>();
+            transportationRepo = new Repository<>();
+
+            clients.addAll(Arrays.asList(loadedClients));
+            accommodations.addAll(Arrays.asList(loadedAccommodations));
+            transportations.addAll(Arrays.asList(loadedTransportations));
+
+            for (Client c : clients) clientRepo.add(c);
+            for (Accommodation a : accommodations) accommodationRepo.add(a);
+            for (Transportation t : transportations) transportationRepo.add(t);
+
+            Trip[] loadedTrips = TripFileManager.loadTrips(
+                    "output/data/trips.csv",
+                    loadedClients,
+                    loadedAccommodations,
+                    loadedTransportations
+            );
+            trips = new ArrayList<>();
+            trips.addAll(Arrays.asList(loadedTrips));
+
+            tripRepo = new Repository<>();
+            for (Trip tr : trips) tripRepo.add(tr);
 
             System.out.println("All data loaded !");
         } catch (IOException e) {
@@ -48,10 +84,10 @@ public class SmartTravelService {
      */
     public static void saveAllData(){
         try {
-            ClientFileManager.saveClients(clients,"output/data/clients.csv");
-            AccommodationFileManager.saveAccommodations(accommodations,"output/data/accommodations.csv");
-            TransportFileManager.saveTransportations(transportations,"output/data/transports.csv");
-            TripFileManager.saveTrips(trips,"output/data/trips.csv");
+            ClientFileManager.saveClients(clients.toArray(new Client[0]),"output/data/clients.csv");
+            AccommodationFileManager.saveAccommodations(accommodations.toArray(new Accommodation[0]),"output/data/accommodations.csv");
+            TransportFileManager.saveTransportations(transportations.toArray(new Transportation[0]),"output/data/transports.csv");
+            TripFileManager.saveTrips(trips.toArray(new Trip[0]),"output/data/trips.csv");
 
             System.out.println("All data saved !");
 
@@ -64,10 +100,15 @@ public class SmartTravelService {
      * Clears all data from memory.
      */
     public static void clearAllData() {
-        clients = new Client[0];
-        trips = new Trip[0];
-        accommodations = new Accommodation[0];
-        transportations = new Transportation[0];
+        clients = new ArrayList<>();
+        trips = new ArrayList<>();
+        accommodations = new ArrayList<>();
+        transportations = new ArrayList<>();
+
+        clientRepo = new Repository<>();
+        tripRepo = new Repository<>();
+        accommodationRepo = new Repository<>();
+        transportationRepo = new Repository<>();
     }
 
     /**
@@ -76,10 +117,10 @@ public class SmartTravelService {
 
     public static void addClient() {
 
-        if (clients.length >= 100) {
-            System.err.println("Maximum number of clients reached. Cannot add more.");
-            return;
-        }
+      //  if (clients.length >= 100) {
+        //    System.err.println("Maximum number of clients reached. Cannot add more.");
+        //    return;
+       // }
 
         try {
             System.out.print("Enter client First Name: ");
@@ -98,16 +139,8 @@ public class SmartTravelService {
             Client client = new Client(firstName, lastName, email);
 
 
-            Client[] clientProcess = new Client[clients.length + 1];
-
-            if (clients.length > 0) {
-                for (int i = 0; i < clients.length; i++) {
-                    clientProcess[i] = clients[i];
-                }
-            }
-
-            clientProcess[clientProcess.length - 1] = client;
-            clients = clientProcess;
+            clients.add(client);
+            clientRepo.add(client);
         } catch (InvalidClientDataException | DuplicateEmailException e) {
             System.err.println(e.getMessage());
         }
@@ -118,7 +151,7 @@ public class SmartTravelService {
      */
 
     public static void editClient() {
-        if (clients.length == 0) {
+        if (clients.isEmpty()) {
             System.out.println("There is no client to edit.");
         } else {
             String id;
@@ -134,24 +167,24 @@ public class SmartTravelService {
 
                 int choice = 0;
 
-                for (int i = 0; i < clients.length; i++) {
-                    if (clients[i].getClientId().equals(id))
+                for (int i = 0; i < clients.size(); i++) {
+                    if (clients.get(i).getClientId().equals(id))
                         choice = i;
                 }
 
                 try {
                     System.out.print("Enter new client First Name > ");
                     String firstName = sc.nextLine();
-                    clients[choice].setFirstName(firstName);
+                    clients.get(choice).setFirstName(firstName);
 
                     System.out.print("Enter new client Last Name > ");
                     String lastName = sc.nextLine();
-                    clients[choice].setLastName(lastName);
+                    clients.get(choice).setLastName(lastName);
 
                     System.out.print("Enter new client Email > ");
                     String email = sc.nextLine();
                     try {
-                        clients[choice].setEmail(email);
+                        clients.get(choice).setEmail(email);
                     } catch (DuplicateEmailException e) {
                         System.err.println(e.getMessage());
                     }
@@ -169,7 +202,7 @@ public class SmartTravelService {
      */
 
     public static void deleteClient() {
-        if (clients.length == 0) {
+        if (clients.isEmpty()) {
             System.out.println("There is no client to delete.");
         } else {
             String id;
@@ -181,24 +214,7 @@ public class SmartTravelService {
             }
 
             if (!id.equals("0")) {
-
-                Client[] smallerClient;
-
-                if ((clients.length - 1) == 0) {
-                    smallerClient = new Client[0];
-                } else {
-                    smallerClient = new Client[clients.length - 1];
-
-                    int compteur = 0;
-
-                    for (int i = 0; i < clients.length; i++) {
-                        if (!id.equalsIgnoreCase(clients[i].getClientId())) {
-                            smallerClient[compteur++] = clients[i];
-                        }
-                    }
-                }
-
-                clients = smallerClient;
+                clients.removeIf(c -> c != null && id.equalsIgnoreCase(c.getClientId()));
             }
         }
     }
@@ -208,9 +224,10 @@ public class SmartTravelService {
      */
 
     public static void displayClients() {
-        if (clients.length != 0) {
-            for (int i = 0; i < clients.length; i++) {
-                System.out.println(i + ". " + clients[i].getClientId() + ", " + clients[i].getFirstName() + " " + clients[i].getLastName());
+        if (!clients.isEmpty()) {
+            for (int i = 0; i < clients.size(); i++) {
+                Client c = clients.get(i);
+                System.out.println(i + ". " + c.getClientId() + ", " + c.getFirstName() + " " + c.getLastName());
             }
         } else {
             System.out.println("There is no clients to display.");
@@ -225,10 +242,10 @@ public class SmartTravelService {
      */
     public static void createTrip() {
 
-        if (trips.length >= 200) {
-            System.err.println("Maximum number of trips reached. Cannot add more.");
-            return;
-        }
+        //if (trips.length >= 200) {
+        //    System.err.println("Maximum number of trips reached. Cannot add more.");
+        //    return;
+       // }
 
         Accommodation accomodation = null;
         Transportation transportation = null;
@@ -244,7 +261,7 @@ public class SmartTravelService {
 
         Client client = null;
 
-        if (clients.length != 0) {
+        if (!clients.isEmpty()) {
             String id = "";
 
             try {
@@ -260,21 +277,21 @@ public class SmartTravelService {
 
             int choice = -1;
 
-            for  (int i = 0; i < clients.length; i++) {
-                if (clients[i].getClientId().equalsIgnoreCase(id)) {
+            for  (int i = 0; i < clients.size(); i++) {
+                if (clients.get(i).getClientId().equalsIgnoreCase(id)) {
                     choice = i;
                 }
             }
 
             if (choice != -1)
-                client = clients[choice];
+                client = clients.get(choice);
 
         } else {
             System.out.println("No client to associate please create one before creating a trip");
             return;
         }
 
-        if (accommodations.length != 0) {
+        if (!accommodations.isEmpty()) {
             String id = "";
             try {
                 id = choiceCheckAccommodation("associate to the trip", false);
@@ -284,20 +301,20 @@ public class SmartTravelService {
 
             int choice = -1;
 
-            for  (int i = 0; i < accommodations.length; i++) {
-                if (accommodations[i].getAccommodationId().equalsIgnoreCase(id)) {
+            for  (int i = 0; i < accommodations.size(); i++) {
+                if (accommodations.get(i).getAccommodationId().equalsIgnoreCase(id)) {
                     choice = i;
                 }
             }
 
             if (choice != -1)
-                accomodation = accommodations[choice];
+                accomodation = accommodations.get(choice);
 
         } else {
             System.err.println("No accommodation to associate please create one and add it to the trip later");
         }
 
-        if (transportations.length != 0) {
+        if (!transportations.isEmpty()) {
             String id = "";
             try {
                 id = choiceCheckTransportation("associate to the trip", false);
@@ -307,14 +324,14 @@ public class SmartTravelService {
 
             int index = -1;
 
-            for  (int i = 0; i < transportations.length; i++) {
-                if (id.equalsIgnoreCase(transportations[i].getTransportId())) {
+            for  (int i = 0; i < transportations.size(); i++) {
+                if (id.equalsIgnoreCase(transportations.get(i).getTransportId())) {
                     index = i;
                 }
             }
 
             if (index != -1)
-                transportation = transportations[index];
+                transportation = transportations.get(index);
         } else {
             System.err.println("No transportation to associate please create one and add it to the trip later");
         }
@@ -326,15 +343,8 @@ public class SmartTravelService {
             try {
                 Trip trip = new Trip(destination, daysDuration, price, client, accomodation, transportation);
 
-                Trip[] tripsCopy = new Trip[trips.length + 1];
-
-                for (int i = 0; i < trips.length; i++) {
-                    tripsCopy[i] = trips[i];
-                }
-
-                tripsCopy[tripsCopy.length - 1] = trip;
-
-                trips = tripsCopy;
+                trips.add(trip);
+                tripRepo.add(trip);
 
                 System.out.println("New trip created successfully");
 
@@ -349,7 +359,7 @@ public class SmartTravelService {
      * Updates destination, duration, price, accommodation, and transportation.
      */
     public static void editTripInformation() {
-        if (trips.length != 0) {
+        if (!trips.isEmpty()) {
             String choice;
 
             try {
@@ -361,8 +371,8 @@ public class SmartTravelService {
 
             int choiceTrip = -1;
 
-            for (int i = 0; i < trips.length; i++) {
-                if (trips[i].getTripId().equalsIgnoreCase(choice))
+            for (int i = 0; i < trips.size(); i++) {
+                if (trips.get(i).getTripId().equalsIgnoreCase(choice))
                     choiceTrip = i;
             }
 
@@ -383,15 +393,15 @@ public class SmartTravelService {
                 String accId = "";
                 String transId = "";
 
-                if (accommodations.length != 0) {
+                if (!accommodations.isEmpty()) {
                     try {
                         accId = choiceCheckAccommodation("associate to the trip", false);
                     } catch (EntityNotFoundException e) {
                         System.err.println(e.getMessage());
                     }
 
-                    for (int i = 0; i < accommodations.length; i++) {
-                        if (accId.equalsIgnoreCase(accommodations[i].getAccommodationId())) {
+                    for (int i = 0; i < accommodations.size(); i++) {
+                        if (accId.equalsIgnoreCase(accommodations.get(i).getAccommodationId())) {
                             choiceAccommodation = i;
                         }
                     }
@@ -399,15 +409,15 @@ public class SmartTravelService {
                     System.out.println("No accommodation registered add one and try again");
                 }
 
-                if (transportations.length != 0) {
+                if (!transportations.isEmpty()) {
                     try {
                         transId = choiceCheckTransportation("associate to the trip", false);
                     } catch (EntityNotFoundException e) {
                         System.err.println(e.getMessage());
                     }
 
-                    for (int i = 0; i < transportations.length; i++) {
-                        if (transId.equalsIgnoreCase(transportations[i].getTransportId())) {
+                    for (int i = 0; i < transportations.size(); i++) {
+                        if (transId.equalsIgnoreCase(transportations.get(i).getTransportId())) {
                             choiceTransportation = i;
                         }
                     }
@@ -421,14 +431,14 @@ public class SmartTravelService {
                 }
 
                 try {
-                    trips[choiceTrip].setDestination(destination);
-                    trips[choiceTrip].setDurationInDays(duration);
-                    trips[choiceTrip].setBasePrice(price);
+                    trips.get(choiceTrip).setDestination(destination);
+                    trips.get(choiceTrip).setDurationInDays(duration);
+                    trips.get(choiceTrip).setBasePrice(price);
                     if (choiceAccommodation != -1) {
-                        trips[choiceTrip].setAccommodation(accommodations[choiceAccommodation]);
+                        trips.get(choiceTrip).setAccommodation(accommodations.get(choiceAccommodation));
                     }
                     if (choiceTransportation != -1) {
-                        trips[choiceTrip].setTransportation(transportations[choiceTransportation]);
+                        trips.get(choiceTrip).setTransportation(transportations.get(choiceTransportation));
                     }
 
                     System.out.println("Trip edited successfully");
@@ -447,7 +457,7 @@ public class SmartTravelService {
      * Rebuilds trips array without the removed trip.
      */
     public static void cancelTrip() {
-        if (trips.length != 0) {
+        if (!trips.isEmpty()) {
             String choice = "";
 
             try {
@@ -459,29 +469,14 @@ public class SmartTravelService {
 
             int index = 0;
 
-            for (int i = 0; i < trips.length; i++) {
-                if (choice.equalsIgnoreCase(trips[i].getTripId())) {
+            for (int i = 0; i < trips.size(); i++) {
+                if (choice.equalsIgnoreCase(trips.get(i).getTripId())) {
                     index = i;
                 }
             }
 
             if (!choice.equalsIgnoreCase("0")) {
-
-                Trip[] tripCopy = new Trip[trips.length - 1];
-
-                if (tripCopy.length != 0) {
-                    int tripCopyCompteur = 0;
-                    for (int i = 0; i < trips.length; i++) {
-                        if (i != index) {
-                            tripCopy[tripCopyCompteur] = trips[i];
-                            tripCopyCompteur++;
-                        }
-                    }
-
-                    trips = tripCopy;
-                } else {
-                    trips = new Trip[0];
-                }
+                trips.remove(index);
             }
         } else {
             System.out.println("No trip to cancel");
@@ -492,9 +487,9 @@ public class SmartTravelService {
      * listAllTrips(): Prints all trips in the system.
      */
     public static void listAllTrips() {
-        if (trips.length != 0) {
-            for (int i = 0; i < trips.length; i++) {
-                System.out.println(i + ". " + trips[i]);
+        if (!trips.isEmpty()) {
+            for (int i = 0; i < trips.size(); i++) {
+                System.out.println(i + ". " + trips.get(i));
             }
         } else {
             System.out.println("No trips to list");
@@ -505,7 +500,7 @@ public class SmartTravelService {
      * listAllTripsByClient(): Lists all trips associated with a chosen client.
      */
     public static void listAllTripsByClient() {
-        if (trips.length != 0) {
+        if (!trips.isEmpty()) {
             String choice = "";
 
             try {
@@ -517,15 +512,15 @@ public class SmartTravelService {
 
             int index = 0;
 
-            for (int i = 0; i < clients.length; i++) {
-                if (choice.equalsIgnoreCase(clients[i].getClientId())) {
+            for (int i = 0; i < clients.size(); i++) {
+                if (choice.equalsIgnoreCase(clients.get(i).getClientId())) {
                     index = i;
                 }
             }
 
             if (!choice.equalsIgnoreCase("0")) {
                 for (Trip trip : trips) {
-                    if (trip.getClientAssociated() == clients[index]) {
+                    if (trip.getClientAssociated() == clients.get(index)) {
                         System.out.println(trip);
                     }
                 }
@@ -542,10 +537,10 @@ public class SmartTravelService {
      */
     public static void addTransportation() {
 
-        if (transportations.length >= 50) {
-            System.err.println("Maximum number of transportation options reached. Cannot add more.");
-            return;
-        }
+        //if (transportations.length >= 50) {
+            //System.err.println("Maximum number of transportation options reached. Cannot add more.");
+          //  return;
+       // }
 
         int type;
 
@@ -572,12 +567,9 @@ public class SmartTravelService {
                 try {
                     System.out.print("Enter Luggage Allowance (kg): ");
                     double luggage = valideDoubleInput();
-                    Transportation[] transportationCopy = new Transportation[transportations.length + 1];
-                    for (int i = 0; i < transportations.length; i++) {
-                        transportationCopy[i] = transportations[i];
-                    }
-                    transportationCopy[transportationCopy.length - 1] = new Flight(company, departure, arrival, luggage);
-                    transportations = transportationCopy;
+                    Transportation t = new Flight(company, departure, arrival, luggage);
+                    transportations.add(t);
+                    transportationRepo.add(t);
                     System.out.println("Transportation added successfully.");
                 } catch (InvalidTransportDataException | NumberFormatException e) {
                     System.err.println(e.getMessage());
@@ -588,13 +580,10 @@ public class SmartTravelService {
                 String trainType = sc.nextLine();
                 System.out.print("Enter Seat Class (Economy/Business): ");
                 String seatClass = sc.nextLine();
-                Transportation[] transportationCopy = new Transportation[transportations.length + 1];
-                for (int i = 0; i < transportations.length; i++) {
-                    transportationCopy[i] = transportations[i];
-                }
                 try {
-                    transportationCopy[transportationCopy.length - 1] = new Train(company, departure, arrival, trainType, seatClass);
-                    transportations = transportationCopy;
+                    Transportation t = new Train(company, departure, arrival, trainType, seatClass);
+                    transportations.add(t);
+                    transportationRepo.add(t);
                     System.out.println("Transportation added successfully.");
                 } catch (InvalidTransportDataException e) {
                     System.err.println(e.getMessage());
@@ -603,13 +592,10 @@ public class SmartTravelService {
             case 3 -> {
                 System.out.print("Enter Number of Stops: ");
                 int stops = valideIntegerInput();
-                Transportation[] transportationCopy = new Transportation[transportations.length + 1];
-                for (int i = 0; i < transportations.length; i++) {
-                    transportationCopy[i] = transportations[i];
-                }
                 try {
-                    transportationCopy[transportationCopy.length - 1] = new Bus(company, departure, arrival, stops);
-                    transportations = transportationCopy;
+                    Transportation t = new Bus(company, departure, arrival, stops);
+                    transportations.add(t);
+                    transportationRepo.add(t);
                     System.out.println("Transportation added successfully.");
                 } catch (InvalidTransportDataException e) {
                     System.err.println(e.getMessage());
@@ -623,7 +609,7 @@ public class SmartTravelService {
      */
     public static void listTransportationOptions() {
 
-        if (transportations.length == 0) {
+        if (transportations.isEmpty()) {
             System.out.println("No transportation options recorded.");
             return;
         }
@@ -649,7 +635,7 @@ public class SmartTravelService {
      */
     public static void removeTransportation() {
 
-        if (transportations.length == 0) {
+        if (transportations.isEmpty()) {
             System.out.println("There are no transportation options to remove.");
             return;
         }
@@ -664,17 +650,7 @@ public class SmartTravelService {
         }
 
         if (!id.equals("0")) {
-
-            Transportation[] copyTransportations = new Transportation[transportations.length - 1];
-
-            int compteur = 0;
-            for (int i = 0; i < transportations.length; i++) {
-                if (!id.equals(transportations[i].getTransportId())) {
-                    copyTransportations[compteur++] = transportations[i];
-                }
-            }
-
-            transportations = copyTransportations;
+            transportations.removeIf(t -> t != null && id.equals(t.getTransportId()));
 
             System.out.println("Transportation removed successfully.");
         }
@@ -686,10 +662,10 @@ public class SmartTravelService {
      */
     public static void addAccommodation() {
 
-        if (accommodations.length >= 50) {
-            System.err.println("Maximum number of accommodation options reached. Cannot add more.");
-            return;
-        }
+        //if (accommodations.length >= 50) {
+            //System.err.println("Maximum number of accommodation options reached. Cannot add more.");
+          //  return;
+       // }
 
         int type;
 
@@ -715,13 +691,10 @@ public class SmartTravelService {
             case 1 -> {
                 System.out.print("Enter Star Rating: ");
                 int stars = valideIntegerInput();
-                Accommodation[] copyAccommodations = new Accommodation[accommodations.length + 1];
-                for (int i = 0; i < accommodations.length; i++) {
-                    copyAccommodations[i] = accommodations[i];
-                }
                 try {
-                    copyAccommodations[copyAccommodations.length - 1] = new Hotel(name, location, price, stars);
-                    accommodations = copyAccommodations;
+                    Accommodation a = new Hotel(name, location, price, stars);
+                    accommodations.add(a);
+                    accommodationRepo.add(a);
                     System.out.println("Accommodation added successfully.");
                 } catch (InvalidAccommodationDataException e) {
                     System.err.println(e.getMessage());
@@ -731,13 +704,10 @@ public class SmartTravelService {
                 int stars = valideIntegerInput();
                 System.out.print("Enter Number of Shared Beds: ");
                 int beds = valideIntegerInput();
-                Accommodation[] copyAccommodations = new Accommodation[accommodations.length + 1];
-                for (int i = 0; i < accommodations.length; i++) {
-                    copyAccommodations[i] = accommodations[i];
-                }
                 try {
-                    copyAccommodations[copyAccommodations.length - 1] = new Hostel(name, location, stars, beds);
-                    accommodations = copyAccommodations;
+                    Accommodation a = new Hostel(name, location, stars, beds);
+                    accommodations.add(a);
+                    accommodationRepo.add(a);
                     System.out.println("Accommodation added successfully.");
                 } catch (InvalidAccommodationDataException e) {
                     System.err.println(e.getMessage());
@@ -751,7 +721,7 @@ public class SmartTravelService {
      */
     public static void removeAccommodation() {
 
-        if (accommodations.length == 0) {
+        if (accommodations.isEmpty()) {
             System.out.println("There are no accommodation options to remove.");
             return;
         }
@@ -766,18 +736,7 @@ public class SmartTravelService {
         }
 
         if (!id.equals("0")) {
-
-            Accommodation[] copyAccommodations = new Accommodation[accommodations.length - 1];
-
-            int compteur = 0;
-
-            for (int i = 0; i < accommodations.length; i++) {
-                if (!accommodations[i].getAccommodationId().equalsIgnoreCase(id)) {
-                    copyAccommodations[compteur++] = accommodations[i];
-                }
-            }
-
-            accommodations = copyAccommodations;
+            accommodations.removeIf(a -> a != null && a.getAccommodationId().equalsIgnoreCase(id));
 
             System.out.println("Accommodation removed successfully.");
         }
@@ -789,7 +748,7 @@ public class SmartTravelService {
      */
     public static void listAccommodationByType() {
 
-        if (accommodations.length != 0) {
+        if (!accommodations.isEmpty()) {
             System.out.println("--- Hotels ---");
             for (Accommodation a : accommodations) {
                 if (a instanceof Hotel)
@@ -942,7 +901,7 @@ public class SmartTravelService {
      * 4 - Create a deep copy of the accommodation array
      */
 
-    public static void additionalOperations() throws InvalidAccommodationDataException, InvalidTransportDataException, InvalidTripDataException {
+    public static void additionalOperations() throws InvalidAccommodationDataException, InvalidTransportDataException {
 
         int choice;
 
@@ -959,13 +918,13 @@ public class SmartTravelService {
 
             switch (choice) {
                 case 1 -> {
-                    mostExpensiveTrip(trips);
+                    mostExpensiveTrip(getTrips());
                 } case 2 -> {
-                    totalCostOfATrip(trips);
+                    totalCostOfATrip(getTrips());
                 } case 3 -> {
 
-                    if (transportations.length != 0) {
-                        Transportation[] copyTransportations = copyTransportationArray(transportations);
+                    if (!transportations.isEmpty()) {
+                        Transportation[] copyTransportations = copyTransportationArray(getTransportations());
 
                         System.out.println("Here is the deep copy of the transportation array");
                         for (Transportation transportation : copyTransportations) {
@@ -977,8 +936,8 @@ public class SmartTravelService {
 
                 } case 4 -> {
 
-                    if (accommodations.length != 0) {
-                        Accommodation[] copyAccommodations = copyAccommodationArray(accommodations);
+                    if (!accommodations.isEmpty()) {
+                        Accommodation[] copyAccommodations = copyAccommodationArray(getAccommodations());
 
                         System.out.println("Here is the deep copy of the accomodation array");
                         for (Accommodation accommodation : copyAccommodations) {
@@ -1001,7 +960,7 @@ public class SmartTravelService {
      * If no trips exist, informs the user.
      */
     public static void totalCostOfATrip(Trip[] trips) {
-        if (trips.length == 0) {
+        if (trips == null || trips.length == 0) {
             System.out.println("There is no trip stored.");
         } else {
             int choice;
@@ -1010,7 +969,7 @@ public class SmartTravelService {
                 for (int i = 0; i < trips.length; i++) {
                     System.out.println((i + 1) + ". " + trips[i].getTripId());
                 }
-                choice = sc.nextInt();
+                choice = valideIntegerInput();
             } while (choice < 1 || choice > trips.length);
 
             System.out.println("Total cost of trip [" + trips[choice - 1].getTripId() + "]" + trips[choice -1].calculateTotalCost());
@@ -1122,17 +1081,9 @@ public class SmartTravelService {
      * @param client The client to add.
      */
     public static void addClientPredefined(Client client) {
-        if (clients.length >= 100) {
-            System.err.println("Maximum number of clients reached. Cannot add more.");
-            return;
-        }
 
-        Client[] copyClients = new Client[clients.length + 1];
-        for (int i = 0; i < clients.length; i++) {
-            copyClients[i] = clients[i];
-        }
-        copyClients[copyClients.length - 1] = client;
-        clients = copyClients;
+        clients.add(client);
+        clientRepo.add(client);
     }
 
     /**
@@ -1140,12 +1091,8 @@ public class SmartTravelService {
      * @param trip The trip to add.
      */
     public static void addTripPredefined(Trip trip) {
-        Trip[] copyTrips = new Trip[trips.length + 1];
-        for (int i = 0; i < trips.length; i++) {
-            copyTrips[i] = trips[i];
-        }
-        copyTrips[copyTrips.length - 1] = trip;
-        trips = copyTrips;
+        trips.add(trip);
+        tripRepo.add(trip);
     }
 
     /**
@@ -1154,17 +1101,8 @@ public class SmartTravelService {
      */
     public static void addAccommodationPredefined(Accommodation accommodation) {
 
-        if (accommodations.length >= 50) {
-            System.err.println("Maximum number of accommodation options reached. Cannot add more.");
-            return;
-        }
-
-        Accommodation[] copyAccommodations = new Accommodation[accommodations.length + 1];
-        for (int i = 0; i < accommodations.length; i++) {
-            copyAccommodations[i] = accommodations[i];
-        }
-        copyAccommodations[copyAccommodations.length - 1] = accommodation;
-        accommodations = copyAccommodations;
+        accommodations.add(accommodation);
+        accommodationRepo.add(accommodation);
     }
 
     /**
@@ -1173,17 +1111,9 @@ public class SmartTravelService {
      */
     public static void addTransportationPredefined(Transportation transportation) {
 
-        if (transportations.length >= 50) {
-            System.err.println("Maximum number of transportation options reached. Cannot add more.");
-            return;
-        }
+        transportations.add(transportation);
+        transportationRepo.add(transportation);
 
-        Transportation[] copyTransportations = new Transportation[transportations.length + 1];
-        for (int i = 0; i < transportations.length; i++) {
-            copyTransportations[i] = transportations[i];
-        }
-        copyTransportations[copyTransportations.length - 1] = transportation;
-        transportations = copyTransportations;
     }
 
     /**
@@ -1206,7 +1136,7 @@ public class SmartTravelService {
      * @return Array of clients.
      */
     public static Client[] getClients() {
-        return clients;
+        return clients.toArray(new Client[0]);
     }
 
     /**
@@ -1214,7 +1144,7 @@ public class SmartTravelService {
      * @return Array of trips.
      */
     public static Trip[] getTrips() {
-        return trips;
+        return trips.toArray(new Trip[0]);
     }
 
     /**
@@ -1222,7 +1152,7 @@ public class SmartTravelService {
      * @return Array of accommodations.
      */
     public static Accommodation[] getAccommodations() {
-        return accommodations;
+        return accommodations.toArray(new Accommodation[0]);
     }
 
     /**
@@ -1230,6 +1160,6 @@ public class SmartTravelService {
      * @return Array of transportations.
      */
     public static Transportation[] getTransportations() {
-        return transportations;
+        return transportations.toArray(new Transportation[0]);
     }
 }

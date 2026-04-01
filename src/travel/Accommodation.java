@@ -1,10 +1,12 @@
 package travel;
 
 import exceptions.InvalidAccommodationDataException;
+import interfaces.CsvPersistable;
+import interfaces.Identifiable;
 
 import java.util.Objects;
 
-public abstract class Accommodation {
+public abstract class Accommodation implements Identifiable, CsvPersistable, Comparable<Accommodation> {
 
     protected String accommodationId;
     protected String name;
@@ -114,5 +116,9 @@ public abstract class Accommodation {
      */
     public abstract double calculateCost(int numberOfDays) throws InvalidAccommodationDataException;
 
+    @Override
+    public String getId() {
+        return accommodationId;
+    }
 
 }

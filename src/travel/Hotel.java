@@ -84,4 +84,48 @@ public class Hotel extends Accommodation {
         return getPricePerNight() * numberOfDays;
     }
 
+    @Override
+    public String toCsvRow() {
+        // Format: Type; ID; Name; Location; PricePerNight; StarRating
+        return "HOTEL;" + getAccommodationId() + ";" + getName() + ";" +
+                getLocation() + ";" + getPricePerNight() + ";" + starRating;
+    }
+
+    @Override
+    public String getId() {
+        // Fulfills the Identifiable interface using the parent's ID
+        return getAccommodationId();
+    }
+
+    @Override
+    public int compareTo(Accommodation o) {
+        return Double.compare(o.getPricePerNight(), this.getPricePerNight());
+    }
+
+
+    public static Hotel fromCsvRow(String csvLine) throws InvalidAccommodationDataException {
+        if (csvLine == null || csvLine.trim().isEmpty()) {
+            throw new InvalidAccommodationDataException("CSV line is empty.");
+        }
+
+        String[] parts = csvLine.split(";");
+
+        // Expecting 6 parts based on toCsvRow: Type, ID, Name, Location, Price, StarRating
+        if (parts.length < 6) {
+            throw new InvalidAccommodationDataException("Invalid number of fields for Hotel.");
+        }
+
+        try {
+            // parts[0] is "Hotel", so we skip to parts[1] for the ID
+            String id = parts[1].trim();
+            String name = parts[2].trim();
+            String location = parts[3].trim();
+            double price = Double.parseDouble(parts[4].trim());
+            int stars = Integer.parseInt(parts[5].trim());
+
+            return new Hotel(id, name, location, price, stars);
+        } catch (NumberFormatException e) {
+            throw new InvalidAccommodationDataException("Error parsing numerical values for Hotel: " + e.getMessage());
+        }
+    }
 }

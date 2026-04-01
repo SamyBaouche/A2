@@ -116,4 +116,45 @@ public class Bus extends Transportation {
 
         return cost;
     }
+
+    @Override
+    public String toCsvRow() {
+        // Format: Type; ID; Company; Departure; Arrival; Price; NumberOfStops
+        return "BUS;" + getTransportId() + ";" + getCompanyName() + ";" +
+                getDepartureCity() + ";" + getArrivalCity() + ";" + getPrice() + ";" +
+                numberOfStops;
+    }
+
+    @Override
+    public String getId() {
+        // Fulfills Identifiable
+        return getTransportId();
+    }
+
+
+    public static Bus fromCsvRow(String csvLine) throws InvalidTransportDataException {
+        if (csvLine == null || csvLine.trim().isEmpty()) {
+            throw new InvalidTransportDataException("CSV line is empty.");
+        }
+
+        String[] parts = csvLine.split(";");
+
+        if (parts.length < 7) {
+            throw new InvalidTransportDataException("Invalid number of fields for Bus.");
+        }
+
+        try {
+            // parts[0] is "Bus"
+            String id = parts[1].trim();
+            String company = parts[2].trim();
+            String departure = parts[3].trim();
+            String arrival = parts[4].trim();
+            double price = Double.parseDouble(parts[5].trim());
+            int stops = Integer.parseInt(parts[6].trim());
+
+            return new Bus(id, company, departure, arrival, price, stops);
+        } catch (NumberFormatException e) {
+            throw new InvalidTransportDataException("Error parsing numerical values for Bus: " + e.getMessage());
+        }
+    }
 }

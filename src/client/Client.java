@@ -5,6 +5,8 @@ import exceptions.InvalidClientDataException;
 
 import java.util.Objects;
 
+import interfaces.CsvPersistable;
+import interfaces.Identifiable;
 import service.SmartTravelService;
 import travel.Trip;
 
@@ -12,7 +14,7 @@ import travel.Trip;
  * The Client class represents a customer in the travel system.
  * Each client has a unique ID, a first name, a last name, and an email.
  */
-public class Client {
+public class Client implements Identifiable, CsvPersistable, Comparable<Client> {
 
     private String clientId;
     private String firstName;
@@ -213,5 +215,54 @@ public class Client {
     }
 
 
+
+
+    @Override
+    public String toCsvRow() {
+        // CSV string matching A2 format: "C1001;Sophia;Rossi;sophia@example.com"
+        return clientId + ";" + firstName + ";" + lastName + ";" + email;
+    }
+
+    @Override
+    public String getId() {
+        return clientId;
+    }
+
+    @Override
+    public int compareTo(Client o) {
+        // Natural Sort Order (business priority): highest spending clients first
+        return Double.compare(o.getTotalSpent(), this.getTotalSpent());
+    }
+
+
+    public static Client fromCsvRow(String csvLine) throws InvalidClientDataException, DuplicateEmailException {
+        // 1. Validate that the line isn't completely empty
+        if (csvLine == null || csvLine.trim().isEmpty()) {
+            throw new InvalidClientDataException("CSV line is empty or null.");
+        }
+
+        // 2. Split the row by the semicolon delimiter
+        String[] parts = csvLine.split(";");
+
+        // 3. Format Validation: Check if we have exactly 4 pieces of data
+        // (ID, First Name, Last Name, Email)
+        if (parts.length != 4) {
+            throw new InvalidClientDataException("Invalid number of fields. Expected 4, got: " + parts.length);
+        }
+
+        // 4. Clean up the data (trim removes the extra spaces like in "; Sophia")
+        String id = parts[0].trim();
+        String firstName = parts[1].trim();
+        String lastName = parts[2].trim();
+        String email = parts[3].trim();
+
+        // 5. Check for missing required fields (basic validation)
+        if (id.isEmpty() || firstName.isEmpty()) {
+            throw new InvalidClientDataException("Required fields (ID or First Name) cannot be blank.");
+        }
+
+        // 6. Return the fully-formed object
+        return new Client(id, firstName, lastName, email);
+    }
 }
 

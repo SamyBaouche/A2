@@ -2,6 +2,8 @@ package travel;
 
 import java.util.Objects;
 import exceptions.InvalidTransportDataException;
+import interfaces.CsvPersistable;
+import interfaces.Identifiable;
 
 
 /**
@@ -10,7 +12,7 @@ import exceptions.InvalidTransportDataException;
  * (e.g., Bus, Train, Flight) and contains common attributes and methods.
  */
 
-public abstract class  Transportation {
+public abstract class Transportation implements Identifiable, CsvPersistable, Comparable<Transportation> {
 
     protected String transportId;
     protected String companyName;
@@ -168,5 +170,21 @@ public abstract class  Transportation {
      * @return cost as a double
      */
     public abstract double calculateCost(int numberOfDays);
+
+    /**
+     * Natural sort order: base price (descending) — premium transport first.
+     */
+    @Override
+    public int compareTo(Transportation o) {
+        if (o == null) {
+            return -1;
+        }
+        return Double.compare(o.getPrice(), this.getPrice());
+    }
+
+    @Override
+    public String getId() {
+        return transportId;
+    }
 
 }

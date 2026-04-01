@@ -132,4 +132,45 @@ public class Train extends Transportation {
 
         return price;
     }
+    @Override
+    public String toCsvRow() {
+        // Format: Type; ID; Company; Departure; Arrival; Price; TrainType; SeatClass
+        return "TRAIN;" + getTransportId() + ";" + getCompanyName() + ";" +
+                getDepartureCity() + ";" + getArrivalCity() + ";" + getPrice() + ";" +
+                trainType + ";" + seatClass;
+    }
+
+    @Override
+    public String getId() {
+        // Fulfills Identifiable
+        return getTransportId();
+    }
+
+
+    public static Train fromCsvRow(String csvLine) throws InvalidTransportDataException {
+        if (csvLine == null || csvLine.trim().isEmpty()) {
+            throw new InvalidTransportDataException("CSV line is empty.");
+        }
+
+        String[] parts = csvLine.split(";");
+
+        if (parts.length < 8) {
+            throw new InvalidTransportDataException("Invalid number of fields for Train.");
+        }
+
+        try {
+            // parts[0] is "Train", so we start at index 1
+            String id = parts[1].trim();
+            String company = parts[2].trim();
+            String departure = parts[3].trim();
+            String arrival = parts[4].trim();
+            double price = Double.parseDouble(parts[5].trim());
+            String type = parts[6].trim();
+            String seat = parts[7].trim();
+
+            return new Train(id, company, departure, arrival, price, type, seat);
+        } catch (NumberFormatException e) {
+            throw new InvalidTransportDataException("Error parsing numerical values for Train: " + e.getMessage());
+        }
+    }
 }

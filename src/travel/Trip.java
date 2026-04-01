@@ -3,6 +3,9 @@ package travel;
 import client.Client;
 import exceptions.InvalidAccommodationDataException;
 import exceptions.InvalidTripDataException;
+import interfaces.Billable;
+import interfaces.CsvPersistable;
+import interfaces.Identifiable;
 import service.SmartTravelService;
 
 /**
@@ -10,7 +13,7 @@ import service.SmartTravelService;
  * It contains information about the destination, duration,
  * pricing, associated client, accommodation, and transportation.
  */
-public class Trip {
+public class Trip implements Identifiable, Billable, CsvPersistable, Comparable<Trip> {
 
     private String tripID;
     private String destination;
@@ -160,9 +163,16 @@ public class Trip {
         return durationInDays;
     }
 
+    @Override
     public double getBasePrice() {
         return basePrice;
     }
+
+    @Override
+    public double getTotalCost() {
+        return calculateTotalCost();
+    }
+
 
     public Client getClientAssociated() {
         return clientAssociated;
@@ -194,7 +204,7 @@ public class Trip {
     }
 
     public void setBasePrice(double basePrice) throws InvalidTripDataException {
-        if (basePrice < 0 || basePrice < 100) {
+        if (basePrice < 100) {
             throw new InvalidTripDataException("Base price must be positive and over $100.");
         }
 
@@ -239,5 +249,102 @@ public class Trip {
         if (idNum > tripIdCounter) {
             tripIdCounter = idNum;
         }
+    }
+
+    public static Trip fromCsvRow(String csvLine) throws InvalidTripDataException {
+        if (csvLine == null || csvLine.trim().isEmpty()) {
+            throw new InvalidTripDataException("CSV line is empty.");
+        }
+
+        // Required A2 trip CSV format:
+        // TripID;ClientID;AccommodationID;TransportationID;Destination;DurationDays;BasePrice
+        String[] parts = csvLine.split(";");
+        if (parts.length != 7) {
+            throw new InvalidTripDataException("Invalid number of fields for Trip. Expected 7, got: " + parts.length);
+        }
+
+        String tripId = parts[0].trim();
+        String clientId = parts[1].trim();
+        String accId = parts[2].trim();
+        String transId = parts[3].trim();
+        String destination = parts[4].trim();
+
+        int duration;
+        try {
+            duration = Integer.parseInt(parts[5].trim());
+        } catch (NumberFormatException e) {
+            throw new InvalidTripDataException("Invalid duration value: " + parts[5].trim());
+        }
+
+        double basePrice;
+        try {
+            basePrice = Double.parseDouble(parts[6].trim());
+        } catch (NumberFormatException e) {
+            throw new InvalidTripDataException("Invalid base price value: " + parts[6].trim());
+        }
+
+        // Lookup linked objects from the service layer (already loaded in memory)
+        Client client = null;
+        for (Client c : SmartTravelService.getClients()) {
+            if (c != null && c.getId().equalsIgnoreCase(clientId)) {
+                client = c;
+                break;
+            }
+        }
+        if (client == null) {
+            throw new InvalidTripDataException("Client not found: " + clientId);
+        }
+
+        Accommodation accommodation = null;
+        if (!accId.isEmpty()) {
+            for (Accommodation a : SmartTravelService.getAccommodations()) {
+                if (a != null && a.getId().equalsIgnoreCase(accId)) {
+                    accommodation = a;
+                    break;
+                }
+            }
+        }
+
+        Transportation transportation = null;
+        if (!transId.isEmpty()) {
+            for (Transportation t : SmartTravelService.getTransportations()) {
+                if (t != null && t.getId().equalsIgnoreCase(transId)) {
+                    transportation = t;
+                    break;
+                }
+            }
+        }
+
+        // Enforce business rule: at least one of accommodation or transportation must exist
+        if (accommodation == null && transportation == null) {
+            throw new InvalidTripDataException("A trip must have at least an accommodation or a transportation.");
+        }
+
+        Trip trip = new Trip(tripId, destination, duration, basePrice, client, accommodation, transportation);
+        updateIdCounter(tripId);
+        return trip;
+    }
+
+
+    @Override
+    public String toCsvRow() {
+        // CSV string matching A2 trips format:
+        // TripID;ClientID;AccommodationID;TransportationID;Destination;DurationDays;BasePrice
+        String clientId = (clientAssociated != null) ? clientAssociated.getId() : "";
+        String accId = (accommodation != null) ? accommodation.getId() : "";
+        String transId = (transportation != null) ? transportation.getId() : "";
+
+        return tripID + ";" + clientId + ";" + accId + ";" + transId + ";" +
+                destination + ";" + durationInDays + ";" + basePrice;
+    }
+
+    @Override
+    public String getId() {
+        return this.tripID;
+    }
+
+    @Override
+    public int compareTo(Trip o) {
+        return Double.compare(o.getTotalCost(), this.getTotalCost());
     }
 }
