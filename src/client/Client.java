@@ -264,5 +264,13 @@ public class Client implements Identifiable, CsvPersistable, Comparable<Client> 
         // 6. Return the fully-formed object
         return new Client(id, firstName, lastName, email);
     }
+
+    public static void updateIdCounter(String lastId) {
+        int idNum = Integer.parseInt(lastId.substring(1));
+
+        if (idNum >= idCounter) {
+            idCounter = idNum + 1;
+        }
+    }
 }
 

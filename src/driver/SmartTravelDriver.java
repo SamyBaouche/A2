@@ -90,18 +90,22 @@ public class SmartTravelDriver {
                         }
 
                         case 7 -> {
-                            SmartTravelService.loadAllData();
+                            SmartTravelService.advancedAnalyticsMenu();
                         }
 
                         case 8 -> {
-                            SmartTravelService.saveAllData();
+                            SmartTravelService.loadAllData();
                         }
 
                         case 9 -> {
-                            predefinedScenario();
+                            SmartTravelService.saveAllData();
                         }
 
                         case 10 -> {
+                            predefinedScenario();
+                        }
+
+                        case 11 -> {
                             try {
                                 visualization.DashboardGenerator.generateDashboard();
                             } catch (IOException e) {
@@ -125,7 +129,9 @@ public class SmartTravelDriver {
 
     }
 
-    // --- Main Menu ---
+    /**
+     * Prints the main menu and returns the user's choice.
+     */
     public static int mainMenu() {
 
         int choice;
@@ -140,15 +146,16 @@ public class SmartTravelDriver {
             System.out.println("4. Accomodation Management");
             System.out.println("5. Additional Operations");
             System.out.println("6. List All Data Summary");
-            System.out.println("7. Load All Data");
-            System.out.println("8. Save All Data");
-            System.out.println("9. Run Predefined Scenario");
-            System.out.println("10. Generate Dashboard");
+            System.out.println("7. Advanced Analytics");
+            System.out.println("8. Load All Data");
+            System.out.println("9. Save All Data");
+            System.out.println("10. Run Predefined Scenario");
+            System.out.println("11. Generate Dashboard");
             System.out.println("0. Exit");
             System.out.print("> ");
 
             choice = SmartTravelService.valideIntegerInput();
-        } while (choice < 0 || choice > 10);
+        } while (choice < 0 || choice > 11);
 
         return choice;
     }
@@ -314,6 +321,9 @@ public class SmartTravelDriver {
         }
     }
 
+    /**
+     * Runs the predefined scenario that builds sample data and shows the A2/A3 features.
+     */
     public static void predefinedScenario() throws InvalidTransportDataException, InvalidAccommodationDataException, InvalidClientDataException, InvalidTripDataException {
         System.out.println("\n      1. Creating... \n" +
                 "- 3 Clients \n" +

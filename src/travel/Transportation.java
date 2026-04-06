@@ -187,4 +187,12 @@ public abstract class Transportation implements Identifiable, CsvPersistable, Co
         return transportId;
     }
 
+    public static void updateIdCounter(String lastId) {
+        int idNum = Integer.parseInt(lastId.substring(2));
+
+        if (idNum >= idCounter) {
+            idCounter = idNum + 1;
+        }
+    }
+
 }

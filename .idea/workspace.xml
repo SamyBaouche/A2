@@ -4,22 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8beb1c68-f704-428f-a191-461dfb20f807" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/COMP 249 - Assignment 3 - Winter 2026.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/service/RecentList.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/service/Repository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/logs/errors.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output/logs/errors.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/client/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/client/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/service/SmartTravelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/SmartTravelService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/travel/Accommodation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/travel/Accommodation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/travel/Bus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/travel/Bus.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/travel/Flight.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/travel/Flight.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/travel/Hostel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/travel/Hostel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/travel/Hotel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/travel/Hotel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/travel/Train.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/travel/Train.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/travel/Transportation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/travel/Transportation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/travel/Trip.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/travel/Trip.java" afterDir="false" />
+    <list default="true" id="2bf8e219-3acf-4f65-af69-b04ca69e16b5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/aws.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,12 +18,12 @@
     </persistenceIdMap>
   </component>
   <component name="CopilotUserSelectedChatMode">
-    <option name="chatModeId" value="Agent" />
+    <option name="chatModeId" value="Ask" />
   </component>
   <component name="CopilotUserSelectedModel">
     <selectedModels>
-      <entry key="chat-panel" value="GPT-5.2" />
-      <entry key="agent-panel" value="GPT-5.2" />
+      <entry key="chat-panel" value="Gemini 3.1 Pro" />
+      <entry key="agent-panel" value="Gemini 3.1 Pro" />
     </selectedModels>
   </component>
   <component name="FileTemplateManagerImpl">

@@ -121,4 +121,12 @@ public abstract class Accommodation implements Identifiable, CsvPersistable, Com
         return accommodationId;
     }
 
+    public static void updateIdCounter(String lastId) {
+        int idNum = Integer.parseInt(lastId.substring(1));
+
+        if (idNum >= idCounter) {
+            idCounter = idNum + 1;
+        }
+    }
+
 }

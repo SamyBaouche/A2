@@ -2,17 +2,14 @@ package service;
 
 import client.Client;
 import exceptions.*;
-import persistence.AccommodationFileManager;
-import persistence.ClientFileManager;
-import persistence.TransportFileManager;
-import persistence.TripFileManager;
+import persistence.GenericFileManager;
 import travel.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 //-----------------------------------------------------
 // Assignment 2
@@ -35,14 +32,17 @@ public class SmartTravelService {
     private static Repository<Accommodation> accommodationRepo = new Repository<>();
     private static Repository<Transportation> transportationRepo = new Repository<>();
 
+    private static RecentList<Client> recentClients = new RecentList<>();
+    private static RecentList<Trip> recentTrips = new RecentList<>();
+
     /**
      * Loads all data from CSV files into the application.
      */
     public static void loadAllData(){
         try {
-            Client[] loadedClients = ClientFileManager.loadClients("output/data/clients.csv");
-            Accommodation[] loadedAccommodations = AccommodationFileManager.loadAccommodations("output/data/accommodations.csv");
-            Transportation[] loadedTransportations = TransportFileManager.loadTransportations("output/data/transports.csv");
+            List<Client> loadedClients = GenericFileManager.load("output/data/clients.csv", Client.class);
+            List<Accommodation> loadedAccommodations = GenericFileManager.load("output/data/accommodations.csv", Accommodation.class);
+            List<Transportation> loadedTransportations = GenericFileManager.load("output/data/transports.csv", Transportation.class);
 
             clients = new ArrayList<>();
             accommodations = new ArrayList<>();
@@ -52,26 +52,36 @@ public class SmartTravelService {
             clientRepo = new Repository<>();
             accommodationRepo = new Repository<>();
             transportationRepo = new Repository<>();
+            recentClients = new RecentList<>();
+            recentTrips = new RecentList<>();
 
-            clients.addAll(Arrays.asList(loadedClients));
-            accommodations.addAll(Arrays.asList(loadedAccommodations));
-            transportations.addAll(Arrays.asList(loadedTransportations));
+            clients.addAll(loadedClients);
+            accommodations.addAll(loadedAccommodations);
+            transportations.addAll(loadedTransportations);
 
             for (Client c : clients) clientRepo.add(c);
             for (Accommodation a : accommodations) accommodationRepo.add(a);
             for (Transportation t : transportations) transportationRepo.add(t);
 
-            Trip[] loadedTrips = TripFileManager.loadTrips(
-                    "output/data/trips.csv",
-                    loadedClients,
-                    loadedAccommodations,
-                    loadedTransportations
-            );
+            List<Trip> loadedTrips = GenericFileManager.load("output/data/trips.csv", Trip.class);
             trips = new ArrayList<>();
-            trips.addAll(Arrays.asList(loadedTrips));
+            trips.addAll(loadedTrips);
 
             tripRepo = new Repository<>();
             for (Trip tr : trips) tripRepo.add(tr);
+
+            for (Client client : clients) {
+                Client.updateIdCounter(client.getClientId());
+            }
+            for (Accommodation accommodation : accommodations) {
+                Accommodation.updateIdCounter(accommodation.getAccommodationId());
+            }
+            for (Transportation transportation : transportations) {
+                Transportation.updateIdCounter(transportation.getTransportId());
+            }
+            for (Trip trip : trips) {
+                Trip.updateIdCounter(trip.getTripId());
+            }
 
             System.out.println("All data loaded !");
         } catch (IOException e) {
@@ -84,10 +94,10 @@ public class SmartTravelService {
      */
     public static void saveAllData(){
         try {
-            ClientFileManager.saveClients(clients.toArray(new Client[0]),"output/data/clients.csv");
-            AccommodationFileManager.saveAccommodations(accommodations.toArray(new Accommodation[0]),"output/data/accommodations.csv");
-            TransportFileManager.saveTransportations(transportations.toArray(new Transportation[0]),"output/data/transports.csv");
-            TripFileManager.saveTrips(trips.toArray(new Trip[0]),"output/data/trips.csv");
+            GenericFileManager.save(clients,"output/data/clients.csv");
+            GenericFileManager.save(accommodations,"output/data/accommodations.csv");
+            GenericFileManager.save(transportations,"output/data/transports.csv");
+            GenericFileManager.save(trips,"output/data/trips.csv");
 
             System.out.println("All data saved !");
 
@@ -109,6 +119,8 @@ public class SmartTravelService {
         tripRepo = new Repository<>();
         accommodationRepo = new Repository<>();
         transportationRepo = new Repository<>();
+        recentClients = new RecentList<>();
+        recentTrips = new RecentList<>();
     }
 
     /**
@@ -345,6 +357,7 @@ public class SmartTravelService {
 
                 trips.add(trip);
                 tripRepo.add(trip);
+                recentTrips.addRecent(trip);
 
                 System.out.println("New trip created successfully");
 
@@ -441,6 +454,8 @@ public class SmartTravelService {
                         trips.get(choiceTrip).setTransportation(transportations.get(choiceTransportation));
                     }
 
+                    recentTrips.addRecent(trips.get(choiceTrip));
+
                     System.out.println("Trip edited successfully");
                 } catch (InvalidTripDataException e) {
                     System.err.println(e.getMessage());
@@ -489,7 +504,9 @@ public class SmartTravelService {
     public static void listAllTrips() {
         if (!trips.isEmpty()) {
             for (int i = 0; i < trips.size(); i++) {
-                System.out.println(i + ". " + trips.get(i));
+                Trip trip = trips.get(i);
+                System.out.println(i + ". " + trip);
+                recentTrips.addRecent(trip);
             }
         } else {
             System.out.println("No trips to list");
@@ -522,6 +539,7 @@ public class SmartTravelService {
                 for (Trip trip : trips) {
                     if (trip.getClientAssociated() == clients.get(index)) {
                         System.out.println(trip);
+                        recentTrips.addRecent(trip);
                     }
                 }
             }
@@ -1093,6 +1111,7 @@ public class SmartTravelService {
     public static void addTripPredefined(Trip trip) {
         trips.add(trip);
         tripRepo.add(trip);
+        recentTrips.addRecent(trip);
     }
 
     /**
@@ -1129,6 +1148,174 @@ public class SmartTravelService {
             }
         }
         throw new EntityNotFoundException("Client not found");
+    }
+
+    /**
+     * Shows the A3 analytics menu and routes the user to the option they choose.
+     */
+    public static void advancedAnalyticsMenu() {
+        int choice;
+
+        do {
+            System.out.println("-- Advanced Analytics --\n");
+            System.out.println("1. Trips by Destination\n" +
+                    "2. Trips by Cost Range\n" +
+                    "3. Top Clients by Spending\n" +
+                    "4. Recent Trips\n" +
+                    "5. Smart Sort Collections\n" +
+                    "6. Back to main menu");
+            System.out.print("> ");
+
+            choice = valideIntegerInput();
+        } while (choice < 1 || choice > 6);
+
+        switch (choice) {
+            case 1 -> tripsByDestination();
+            case 2 -> tripsByCostRange();
+            case 3 -> topClientsBySpending();
+            case 4 -> recentTripsMenu();
+            case 5 -> smartSortCollections();
+            case 6 -> {}
+        }
+    }
+
+    /**
+     * Lists all trips that match a destination entered by the user.
+     */
+    public static void tripsByDestination() {
+        if (trips.isEmpty()) {
+            System.out.println("No trips to filter.");
+            return;
+        }
+
+        System.out.print("Enter destination to search: ");
+        String destination = sc.nextLine();
+
+        Predicate<Trip> byDestination = trip -> trip != null && trip.getDestination().equalsIgnoreCase(destination);
+        List<Trip> matches = tripRepo.filter(byDestination);
+
+        if (matches.isEmpty()) {
+            System.out.println("No trips found for destination: " + destination);
+            return;
+        }
+
+        System.out.println("Trips for destination: " + destination);
+        for (Trip trip : matches) {
+            System.out.println(trip);
+            recentTrips.addRecent(trip);
+        }
+    }
+
+    /**
+     * Lists trips whose total cost falls inside a user-provided range.
+     */
+    public static void tripsByCostRange() {
+        if (trips.isEmpty()) {
+            System.out.println("No trips to filter.");
+            return;
+        }
+
+        System.out.print("Enter minimum total cost: ");
+        double min = valideDoubleInput();
+        System.out.print("Enter maximum total cost: ");
+        double max = valideDoubleInput();
+
+        if (min > max) {
+            double temp = min;
+            min = max;
+            max = temp;
+        }
+
+        double finalMin = min;
+        double finalMax = max;
+        Predicate<Trip> byCostRange = trip -> trip != null && trip.calculateTotalCost() >= finalMin && trip.calculateTotalCost() <= finalMax;
+        List<Trip> matches = tripRepo.filter(byCostRange);
+
+        if (matches.isEmpty()) {
+            System.out.println("No trips found in the selected cost range.");
+            return;
+        }
+
+        System.out.println("Trips with total cost between " + finalMin + " and " + finalMax + ":");
+        for (Trip trip : matches) {
+            System.out.println(trip + " | Total Cost: " + trip.calculateTotalCost());
+            recentTrips.addRecent(trip);
+        }
+    }
+
+    /**
+     * Shows the clients sorted by how much they have spent in total.
+     */
+    public static void topClientsBySpending() {
+        if (clients.isEmpty()) {
+            System.out.println("No clients to sort.");
+            return;
+        }
+
+        List<Client> sortedClients = clientRepo.getSorted();
+        System.out.println("Top Clients by Spending:");
+        for (Client client : sortedClients) {
+            System.out.println(client + " | Total Spent: " + client.getTotalSpent());
+            recentClients.addRecent(client);
+        }
+
+        System.out.println("\nRecent clients from this ranking:");
+        recentClients.printRecent(10);
+    }
+
+    /**
+     * Prints the most recently viewed or edited trips.
+     */
+    public static void recentTripsMenu() {
+        System.out.println("Recent Trips:");
+        recentTrips.printRecent(10);
+    }
+
+    /**
+     * Displays all main collections using their natural business sort order.
+     */
+    public static void smartSortCollections() {
+        System.out.println("-- Smart Sorted Collections --");
+
+        System.out.println("\nClients (by total spending):");
+        List<Client> sortedClients = clientRepo.getSorted();
+        if (sortedClients.isEmpty()) {
+            System.out.println("No clients to display.");
+        } else {
+            for (Client client : sortedClients) {
+                System.out.println(client + " | Total Spent: " + client.getTotalSpent());
+            }
+        }
+
+        System.out.println("\nTrips (by total cost):");
+        List<Trip> sortedTrips = tripRepo.getSorted();
+        if (sortedTrips.isEmpty()) {
+            System.out.println("No trips to display.");
+        } else {
+            for (Trip trip : sortedTrips) {
+                System.out.println(trip + " | Total Cost: " + trip.calculateTotalCost());
+            }
+        }
+
+        System.out.println("\nAccommodations (by price per night):");
+        List<Accommodation> sortedAccommodations = accommodationRepo.getSorted();
+        if (sortedAccommodations.isEmpty()) {
+            System.out.println("No accommodations to display.");
+        } else {
+            for (Accommodation accommodation : sortedAccommodations) {
+                System.out.println(accommodation);
+            }
+        }
+
+        System.out.println("\nTransportations (by price):");
+        List<Transportation> sortedTransportations = transportationRepo.getSorted();
+        if (sortedTransportations.isEmpty()) {
+            System.out.println("No transportations to display.");
+        } else {
+            for (Transportation transportation : sortedTransportations) {
+                System.out.println(transportation);
+            }
+        }
     }
 
     /**

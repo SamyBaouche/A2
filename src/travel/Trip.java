@@ -245,9 +245,9 @@ public class Trip implements Identifiable, Billable, CsvPersistable, Comparable<
         // Strip the "T" and convert to int
         int idNum = Integer.parseInt(lastId.substring(1));
 
-        // Update the tripIdCounter to match the highest from the file
-        if (idNum > tripIdCounter) {
-            tripIdCounter = idNum;
+        // Update the tripIdCounter so the next generated id is above the highest from the file
+        if (idNum >= tripIdCounter) {
+            tripIdCounter = idNum + 1;
         }
     }
 
